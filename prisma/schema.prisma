@@ -1,0 +1,156 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                           String              @id @default(auto()) @map("_id") @db.ObjectId
+  username                     String              @unique
+  email                        String              @unique
+  image                        String?
+  hashedPassword               String?
+  NITUsername                  String
+  NITPassword                  String
+  verifyCode                   String
+  verifyCodeExpiry             DateTime
+  isVerified                   Boolean             @default(false)
+  isAcceptingAnonymousMessages Boolean             @default(true)
+  course                       String?
+  batch                        String?
+  branch                       String?
+  loginDays                    Int?
+  loginStreak                  Int?
+  avatar                       String?
+  honorScore                   Int                 @default(100)
+  lastSeen                     DateTime            @default(now())
+  activeStatus                 Boolean             @default(false)
+  
+  // Relations
+  anonymousMessages            AnonymousMessage[]
+  
+  // Conversations and messages
+  conversationIds              String[]            @db.ObjectId @default([])
+  conversations                Conversation[]      @relation(fields: [conversationIds], references: [id])
+  seenMessageIds               String[]            @db.ObjectId @default([])
+  seenMessages                 Message[]           @relation("Seen", fields: [seenMessageIds], references: [id])
+  messages                     Message[]
+  
+  // Attendance Metrics
+  subjects                     SubjectMetrics[]
+  overallAttendedClasses       Int                 @default(0)
+  overallTotalClasses          Int                 @default(0)
+  overallPercentage            Float               @default(0)
+  
+  // Attendance Records
+  attendanceRecords            Attendance[]
+  dailyAttendanceRecords       DailyAttendance[]
+}
+
+model AnonymousMessage {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  content   String
+  createdAt DateTime @default(now())
+  
+  // Relation to User
+  userId    String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Conversation {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId 
+  createdAt      DateTime @default(now())
+  lastMessageAt  DateTime @default(now())
+  name           String? 
+  isGroup        Boolean?
+  isAnonymous    Boolean? @default(false)
+  
+  userIds        String[] @db.ObjectId
+  users          User[]   @relation(fields: [userIds], references: [id])
+  
+  messagesIds    String[] @db.ObjectId
+  messages       Message[]
+}
+
+model Message {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  body           String?
+  image          String?
+  createdAt      DateTime @default(now())
+  
+  seenIds        String[] @db.ObjectId
+  seen           User[]   @relation("Seen", fields: [seenIds], references: [id])
+  
+  conversationId String   @db.ObjectId
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  
+  senderId       String   @db.ObjectId
+  sender         User     @relation(fields: [senderId], references: [id], onDelete: Cascade)
+}
+
+model SubjectMetrics {
+  id                   String   @id @default(auto()) @map("_id") @db.ObjectId
+  subjectCode          String
+  subjectName          String
+  subjectProfessor     String
+  attendedClasses      Int      @default(0)
+  totalClasses         Int      @default(0)
+  attendancePercentage Float    @default(0)
+  isAbove75            Boolean  @default(false)
+  classesNeeded        Int      @default(0)
+  classesCanSkip       Int      @default(0)
+  
+  // Link back to User
+  userId               String   @db.ObjectId
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Attendance {
+  id       String              @id @default(auto()) @map("_id") @db.ObjectId
+  userId   String              @db.ObjectId
+  user     User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date     DateTime            @default(now())
+  
+  // One-to-many with AttendanceSubject
+  subjects AttendanceSubject[]
+}
+
+model AttendanceSubject {
+  id                    String     @id @default(auto()) @map("_id") @db.ObjectId
+  slNo                  String
+  subjectCode           String
+  subjectName           String
+  facultyName           String
+  presentTotal          String
+  attendancePercentage  String
+  
+  // Link back to Attendance
+  attendanceId          String     @db.ObjectId
+  attendance            Attendance @relation(fields: [attendanceId], references: [id], onDelete: Cascade)
+}
+
+model DailyAttendance {
+  id       String                 @id @default(auto()) @map("_id") @db.ObjectId
+  userId   String                 @db.ObjectId
+  user     User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date     DateTime               @default(now())
+  
+  // One-to-many with DailyAttendanceSubject
+  subjects DailyAttendanceSubject[]
+}
+
+model DailyAttendanceSubject {
+  id                  String            @id @default(auto()) @map("_id") @db.ObjectId
+  subjectCode         String
+  subjectName         String
+  facultyName         String
+  attendedClasses     Int
+  totalClasses        Int
+  
+  // Link back to DailyAttendance
+  dailyAttendanceId   String            @db.ObjectId
+  dailyAttendance     DailyAttendance   @relation(fields: [dailyAttendanceId], references: [id], onDelete: Cascade)
+}

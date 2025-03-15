@@ -1,0 +1,83 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+@layer base {
+  :root {
+    /* Light theme remains unchanged */
+    --background: 220 25% 97%;
+    --foreground: 220 45% 15%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 45% 15%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 45% 15%;
+    --primary: 220 85% 45%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 25% 95%;
+    --secondary-foreground: 220 45% 15%;
+    --muted: 220 25% 95%;
+    --muted-foreground: 220 25% 45%;
+    --accent: 220 25% 95%;
+    --accent-foreground: 220 45% 15%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 25% 90%;
+    --input: 220 25% 90%;
+    --ring: 220 85% 45%;
+    --radius: 0.6rem;
+  }
+
+  .dark {
+    /* Dark theme - enhanced with violet/purple tones */
+    --background: 240 30% 4%;  /* Deep black with slight purple tint */
+    --foreground: 250 15% 95%;
+    --card: 240 30% 6%;
+    --card-foreground: 250 15% 95%;
+    --popover: 240 30% 6%;
+    --popover-foreground: 250 15% 95%;
+    --primary: 265 85% 65%;  /* Vibrant purple */
+    --primary-foreground: 240 30% 4%;
+    --secondary: 250 30% 10%;
+    --secondary-foreground: 250 15% 95%;
+    --muted: 250 30% 10%;
+    --muted-foreground: 250 15% 65%;
+    --accent: 280 50% 25%;  /* Deep purple accent */
+    --accent-foreground: 250 15% 95%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 250 15% 95%;
+    --border: 250 30% 12%;
+    --input: 250 30% 10%;
+    --ring: 265 85% 65%;
+    --radius: 0.6rem;
+  }
+}
+
+/* Hide scrollbars for all elements */
+* {
+  scrollbar-width: none; /* For Firefox */
+  -ms-overflow-style: none; /* For Internet Explorer and Edge */
+}
+
+/* Hide scrollbars for webkit browsers */
+*::-webkit-scrollbar {
+  display: none; /* For Chrome, Safari, and Opera */
+}
+
+@layer utilities {
+  
+  /* Glass effect for cards */
+  .glass-card {
+    @apply bg-background/50 backdrop-blur-sm;
+    border: 1px solid rgb(var(--primary) / 0.1);
+  }
+
+  .glass-card:hover {
+    border-color: rgb(var(--primary) / 0.2);
+  }
+
+  
+}
