@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect } from 'react';
 import clsx from 'clsx';
 import useConversation from '@/app/hooks/useConversation';
 import EmptyState from '@/components/chat/EmptyState';

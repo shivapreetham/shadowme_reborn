@@ -11,9 +11,9 @@ export default function AttendanceLayout({
           <nav className="container mx-auto flex items-center justify-between">
             <h1 className="text-2xl font-bold">Attendance Dashboard</h1>
             <div className="flex gap-6">
-              <Link href="/attendance/dashboard" className="hover:underline">
+              {/* <Link href="/attendance/dashboard" className="hover:underline">
                 Dashboard
-              </Link>
+              </Link> */}
               <Link href="/attendance/calendar" className="hover:underline">
                 Calendar
               </Link>

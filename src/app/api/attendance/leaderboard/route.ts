@@ -1,39 +1,38 @@
+// app/api/leaderboard/route.ts
+import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prismadb";
+import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 
 export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const batch = searchParams.get("batch");
-  const subject = searchParams.get("subject"); // optional filter
+  const session = await getServerSession(authOptions);
+  if (!session || !session.user?.email) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
-  if (!batch)
-    return NextResponse.json({ error: "Batch parameter is required" }, { status: 400 });
+  // Extract batch from email: first 8 characters, uppercase.
+  const userEmail = session.user.email;
+  const batch = userEmail.substring(0, 8).toUpperCase();
 
   try {
-    // Filter users by batch pattern in their email.
-    let users = await prisma.user.findMany({
+    const students = await prisma.user.findMany({
       where: {
-        email: {
-          startsWith: batch, // Using startsWith for efficient filtering
-        },
-      },
-      include: {
-        subjects: true, // Include attendance metrics (subjects)
+        email: { startsWith: batch },
       },
       orderBy: {
         overallPercentage: "desc",
       },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        overallPercentage: true,
+        subjects: true, // subject metrics
+      },
     });
-
-    // Optionally filter by subject if provided
-    if (subject) {
-      users = users.filter(user =>
-        user.subjects.some((s) => s.subjectCode === subject)
-      );
-    }
-
-    return NextResponse.json(users);
+    return NextResponse.json(students);
   } catch (error: any) {
+    console.error("Error fetching leaderboard:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
