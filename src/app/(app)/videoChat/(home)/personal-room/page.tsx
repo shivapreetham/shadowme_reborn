@@ -23,8 +23,6 @@ const PersonalRoom = () => {
   const { toast } = useToast();
   const { currentUser } = useCurrentUserContext();
 
-  // console.log(currentUser, "got the user from context");
-  
   const meetingId = currentUser?.id;
   const { call } = useGetCallById(meetingId!);
 
@@ -37,7 +35,7 @@ const PersonalRoom = () => {
       await newCall.getOrCreate({ data: { starts_at: new Date().toISOString() } });
     }
 
-    router.push(`/meeting/${meetingId}?personal=true`);
+    router.push(`videoChat/meeting/${meetingId}?personal=true`);
   };
 
   const meetingLink = `${process.env.NEXT_PUBLIC_BASE_URL}/meeting/${meetingId}?personal=true`;

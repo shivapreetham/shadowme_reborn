@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import ReactDatePicker from 'react-datepicker';
 import HomeCard from './HomeCard';
 import Loader from './Loader';
@@ -10,8 +10,8 @@ import { Input } from '../ui/input';
 import { Textarea } from '../ui/textarea';
 import { useToast } from '@/app/hooks/use-toast';
 import { useStreamVideoClient, Call } from '@stream-io/video-react-sdk';
-import getCurrentUser from '@/app/actions/getCurrentUser';
-import {User} from '@prisma/client'
+import { useCurrentUserContext } from '@/context/CurrentUserProvider';
+
 const initialValues = {
   dateTime: new Date(),
   description: '',
@@ -28,19 +28,9 @@ const MeetingTypeList = () => {
   const client = useStreamVideoClient();
   const { toast } = useToast();
 
-  // Replace Clerk's user hook with your getCurrentUser()
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [loadingUser, setLoadingUser] = useState(true);
-
-  useEffect(() => {
-    async function fetchUser() {
-      const user = await getCurrentUser();
-      console.log(user, "got the user at meeting type list");
-      setCurrentUser(user);
-      setLoadingUser(false);
-    }
-    fetchUser();
-  }, []);
+  // Get current user from context
+  const { currentUser } = useCurrentUserContext();
+  const loadingUser = !currentUser;
 
   const createMeeting = async () => {
     if (!client || !currentUser) return;
@@ -53,10 +43,14 @@ const MeetingTypeList = () => {
       const call = client.call('default', id);
       if (!call) throw new Error('Failed to create meeting');
 
-      const startsAt = values.dateTime.toISOString() || new Date(Date.now()).toISOString();
+      const startsAt = values.dateTime.toISOString();
       const description = values.description || 'Instant Meeting';
+      
       // Passing currentUser.id along with the meeting data
-      await call.getOrCreate({ data: { starts_at: startsAt, custom: { description, userId: currentUser.id } } });
+      await call.getOrCreate({ 
+        data: { starts_at: startsAt, custom: { description, userId: currentUser.id } } 
+      });
+
       setCallDetail(call);
       if (!values.description) {
         router.push(`videoChat/meeting/${call.id}`);
@@ -68,7 +62,7 @@ const MeetingTypeList = () => {
     }
   };
 
-  if (!client || loadingUser || !currentUser) return <Loader />;
+  if (!client || loadingUser) return <Loader />;
 
   const meetingLink = `${process.env.NEXT_PUBLIC_BASE_URL}/meeting/${callDetail?.id}`;
 
