@@ -17,6 +17,9 @@ export const config = {
     '/users',
     '/conversations',
     '/profile',
+    '/helpMyFriend/:path*',
+    '/attendance/:path*',
+    '/videoChat/:path*',
   ],
 };
 
@@ -31,11 +34,11 @@ export async function middleware(request: NextRequest) {
       url.pathname.startsWith('/sign-up') ||
       url.pathname.startsWith('/verify'))
   ) {
-    return NextResponse.redirect(new URL('/conversations', request.url));
+    return NextResponse.redirect(new URL('/attendance', request.url));
   }
 
   // Redirect unauthenticated users trying to access protected routes
-  if (!token && (url.pathname.startsWith('/dashboard')  || url.pathname.startsWith('/profile') || url.pathname.startsWith('/users') || url.pathname.startsWith('/conversations'))) {
+  if (!token && (url.pathname.startsWith('/dashboard')  || url.pathname.startsWith('/profile') || url.pathname.startsWith('/users') || url.pathname.startsWith('/conversations') || url.pathname.startsWith('/videoChat') || url.pathname.startsWith('/helpMyFriend') || url.pathname.startsWith('/attendance') )) {
     return NextResponse.redirect(new URL('/sign-in', request.url));
   }
 

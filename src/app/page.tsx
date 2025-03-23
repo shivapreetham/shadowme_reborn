@@ -42,7 +42,7 @@ export default function Home() {
               Exclusive Social Platform for NIT Jamshedpur
             </p>
             <p className="text-lg md:text-xl text-muted-foreground italic">
-              "So whom do you really trust?"
+              So whom do you really trust?
             </p>
           </div>
 

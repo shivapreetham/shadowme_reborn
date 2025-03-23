@@ -1,20 +1,15 @@
-// app/attendance/page.tsx
 "use client";
 import { useState, useEffect } from "react";
 import AttendanceCard from "@/components/attendance/AttendanceCard";
 import AttendanceChart from "@/components/attendance/AttendanceChart";
-import getCurrentUser from "@/app/actions/getCurrentUser";
 
 export default function AttendancePage() {
   const [attendanceData, setAttendanceData] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState("");
 
-  // Replace this with your authentication logic to get the logged in user ID.
-  const userId = getCurrentUser();
-
   useEffect(() => {
-    fetch(`/api/attendance/current?userId=${userId}`)
+    fetch(`/api/attendance/current`)
       .then((res) => res.json())
       .then((data) => {
         setAttendanceData(data);
@@ -25,7 +20,7 @@ export default function AttendancePage() {
         setError("Failed to load attendance data");
         setLoading(false);
       });
-  }, [userId]);
+  }, []);
 
   if (loading) return <p>Loading attendance data...</p>;
   if (error) return <p className="text-red-500">{error}</p>;

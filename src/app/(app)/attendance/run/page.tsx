@@ -11,7 +11,8 @@ export default function Home() {
     setError("");
 
     try {
-      const response = await fetch("http://localhost:5000/");
+      // https://testserver-hrna.onrender.com
+      const response = await fetch("https://testserver-hrna.onrender.com/");
       console.log("Response Status:", response.status);
       const data = await response.json();
       console.log("Response Data:", data);
