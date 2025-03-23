@@ -9,9 +9,6 @@ const getUsers = async () => {
 
     // Get all users except the current user
     const users = await prisma.user.findMany({
-      orderBy: {
-        createdAt: 'desc',
-      },
       where: {
         NOT: {
           email: session.user.email as string,
@@ -22,7 +19,7 @@ const getUsers = async () => {
     if (!users) return [];
 
     return users;
-  } catch (error: any) {
+  } catch {
     return [];
   }
 };
