@@ -35,6 +35,7 @@ const MeetingTypeList = () => {
   useEffect(() => {
     async function fetchUser() {
       const user = await getCurrentUser();
+      console.log(user, "got the user at meeting type list");
       setCurrentUser(user);
       setLoadingUser(false);
     }

@@ -13,7 +13,7 @@ const getCurrentUser = async () => {
     });
     // console.log(currentUser)
     if (!currentUser) return null;
-
+    
     return currentUser;
   } catch  {
     return null;

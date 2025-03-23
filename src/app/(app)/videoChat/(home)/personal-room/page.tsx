@@ -1,13 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { useStreamVideoClient } from '@stream-io/video-react-sdk';
 import { useRouter } from 'next/navigation';
 
 import { useGetCallById } from '@/app/hooks/useGetCallById';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/app/hooks/use-toast';
-import getCurrentUser from '@/app/actions/getCurrentUser'; // Assuming this function exists
+import { useCurrentUserContext } from '@/context/CurrentUserProvider';
 
 const Table = ({ title, description }: { title: string; description: string }) => {
   return (
@@ -22,24 +21,15 @@ const PersonalRoom = () => {
   const router = useRouter();
   const client = useStreamVideoClient();
   const { toast } = useToast();
-  const [user, setUser] = useState<{ id: string; username: string } | null>(null);
+  const { currentUser } = useCurrentUserContext();
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      const fetchedUser =  await getCurrentUser();
-      console.log(fetchedUser , "got the kiddie");
-      setUser(fetchedUser ? { id: fetchedUser.id, username: fetchedUser.username || 'Guest' } : null);
-    };
-
-    fetchUser();
-  }, []);
-
-  console.log(user)
-  const meetingId = user?.id;
+  // console.log(currentUser, "got the user from context");
+  
+  const meetingId = currentUser?.id;
   const { call } = useGetCallById(meetingId!);
 
   const startRoom = async () => {
-    if (!client || !user) return;
+    if (!client || !currentUser) return;
 
     const newCall = client.call('default', meetingId!);
 
@@ -56,7 +46,7 @@ const PersonalRoom = () => {
     <section className="flex size-full flex-col gap-10 text-white">
       <h1 className="text-xl font-bold lg:text-3xl">Personal Meeting Room</h1>
       <div className="flex w-full flex-col gap-8 xl:max-w-[900px]">
-        <Table title="Topic" description={`${user?.username}'s Meeting Room`} />
+        <Table title="Topic" description={`${currentUser?.username}'s Meeting Room`} />
         <Table title="Meeting ID" description={meetingId!} />
         <Table title="Invite Link" description={meetingLink} />
       </div>
