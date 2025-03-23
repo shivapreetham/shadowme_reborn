@@ -65,7 +65,7 @@ export default function SignUpForm() {
         description: "You've successfully signed in!",
         variant: 'default',
       });
-      router.replace('/conversations');
+      router.replace('/attendance');
     }
   };
 
