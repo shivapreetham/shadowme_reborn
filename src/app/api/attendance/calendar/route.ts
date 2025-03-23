@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prismadb";
-import { authOptions } from "@/app/api/auth/[...nextauth]/options"; // Ensure this exists!
+import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 
 export async function GET(req: Request) {
   const session = await getServerSession(authOptions);
@@ -19,22 +19,45 @@ export async function GET(req: Request) {
   }
 
   try {
+    // Start of the month
+    const startDate = new Date(year, month - 1, 1);
+    // Start of next month
+    const endDate = new Date(year, month, 0);
+    
+    // Fetch both Attendance and DailyAttendance records for the month
     const attendanceRecords = await prisma.attendance.findMany({
       where: {
         userId,
         date: {
-          gte: new Date(year, month - 1, 1), // Start of month
-          lt: new Date(year, month, 1), // Start of next month
+          gte: startDate,
+          lte: endDate,
         },
       },
-      select: {
-        date: true,
-        // status: true,
-        // subject: true,
+      include: {
+        subjects: true, // Include subject details
+      },
+    });
+    
+    const dailyAttendanceRecords = await prisma.dailyAttendance.findMany({
+      where: {
+        userId,
+        date: {
+          gte: startDate,
+          lte: endDate,
+        },
+      },
+      include: {
+        subjects: true, // Include daily subject details
       },
     });
 
-    return NextResponse.json(attendanceRecords);
+    // Format the response with both types of attendance data
+    const formattedResponse = {
+      attendanceRecords,
+      dailyAttendanceRecords,
+    };
+
+    return NextResponse.json(formattedResponse);
   } catch (error) {
     console.error("Error fetching attendance:", error);
     return NextResponse.json({ error: "Failed to fetch attendance" }, { status: 500 });
