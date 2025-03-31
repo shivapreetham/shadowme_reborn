@@ -1,5 +1,3 @@
-
-// MobileFooter.tsx
 'use client';
 
 import useConversation from '@/app/hooks/useConversation';
@@ -8,23 +6,30 @@ import MobileFooterItem from './MobileFooterItem';
 import { ModeToggle } from '@/components/home&anonymous/ModeToggle';
 
 const MobileFooter = () => {
-  const routes = useRoutes();
+  const { routes } = useRoutes();
   const { isOpen } = useConversation();
 
   if (isOpen) return null;
 
+  // Filter routes to show only the important ones on mobile
+  const mobileRoutes = routes.filter(route => 
+    route.position === 'middle' || route.isPrimary
+  ).slice(0, 4); // Limit to prevent overcrowding
+
   return (
-    <div className="fixed justify-between w-full bottom-0 z-40 flex items-center bg-background/50 backdrop-blur-sm border-t border-border lg:hidden transition-colors duration-300">
-      {routes.map((route) => (
+    <div className="fixed justify-between w-full bottom-0 z-40 flex items-center bg-background/80 backdrop-blur-md border-t border-border lg:hidden transition-colors duration-300 px-1">
+      {mobileRoutes.map((route) => (
         <MobileFooterItem
           key={route.label}
           href={route.href}
           icon={route.icon}
+          label={route.label}
           active={route.active}
           onClick={route.onClick}
+          isPrimary={route.isPrimary}
         />
       ))}
-      <div className="p-4">
+      <div className="p-3">
         <ModeToggle />
       </div>
     </div>

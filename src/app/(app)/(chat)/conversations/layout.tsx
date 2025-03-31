@@ -1,4 +1,4 @@
-import Sidebar from '@/components/chat/sidebar/Sidebar';
+import Sidebar from '@/components/sidebar/Sidebar';
 import ConversationList from './components/ConversationList';
 import getConversations from '@/app/actions/getConversations';
 import getUsers from '@/app/actions/getUsers';

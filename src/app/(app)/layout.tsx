@@ -1,6 +1,6 @@
 import ActiveStatus from '@/components/chat/ActiveStatus';
 import { Metadata } from 'next';
-import Sidebar from '@/components/chat/sidebar/Sidebar';
+import Sidebar from '@/components/sidebar/Sidebar';
 interface RootLayoutProps {
   children: React.ReactNode;
 }
