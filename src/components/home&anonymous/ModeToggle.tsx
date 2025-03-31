@@ -1,26 +1,37 @@
-// ModeToggle.tsx
 'use client';
 
 import * as React from 'react';
 import { Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
-import { Button } from '@/components/ui/button';
 
-export function ModeToggle() {
+interface ModeToggleProps {
+  isExpanded?: boolean;
+}
+
+export function ModeToggle({ isExpanded }: ModeToggleProps) {
   const { theme, setTheme } = useTheme();
+
   return (
-    <Button 
-      variant="outline" 
-      size="icon" 
+    <button
       onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-      className="hover:bg-gray-100 transition-colors"
+      className={`
+        flex items-center justify-center rounded-md transition-colors
+        bg-white shadow-sm hover:bg-gray-100
+        ${isExpanded ? 'px-3 py-2 w-full' : 'p-2 w-9 h-9'}
+      `}
+      aria-label="Toggle theme"
     >
       {theme === 'dark' ? (
-        <Sun className="h-[1.2rem] w-[1.2rem] text-foreground transition-all" />
+        <div className="flex items-center">
+          <Sun size={18} className="text-amber-500" />
+          {isExpanded && <span className="ml-2 text-sm font-medium">Light</span>}
+        </div>
       ) : (
-        <Moon className="h-[1.2rem] w-[1.2rem] text-foreground transition-all" />
+        <div className="flex items-center">
+          <Moon size={18} className="text-indigo-500" />
+          {isExpanded && <span className="ml-2 text-sm font-medium">Dark</span>}
+        </div>
       )}
-      <span className="sr-only">Toggle theme</span>
-    </Button>
+    </button>
   );
 }

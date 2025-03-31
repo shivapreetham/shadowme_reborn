@@ -13,7 +13,8 @@ import {
   HiClipboardDocumentCheck,
   HiClock,
   HiBackward,
-  HiUserCircle
+  HiUserCircle,
+  HiInboxStack
 } from 'react-icons/hi2';
 import { IconType } from 'react-icons';
 
@@ -80,7 +81,7 @@ const useRoutes = () => {
       {
         label: 'Dashboard',
         href: '/dashboard',
-        icon: HiHome,
+        icon: HiInboxStack,
         active: pathname === '/dashboard',
         position: 'middle'
       },

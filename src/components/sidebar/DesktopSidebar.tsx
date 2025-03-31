@@ -111,47 +111,50 @@ const DesktopSidebar: React.FC<DesktopSidebarProps> = ({ currentUser }) => {
           </nav>
 
           {/* Bottom section with divider - user controls */}
-          <div className="mt-auto flex flex-col items-center space-y-3 pt-4 border-t border-gray-200">
-            <div className={`flex ${isExpanded ? 'justify-between w-full px-2' : 'justify-center'} items-center`}>
-              <div className="p-2">
-                <ModeToggle />
+          <div className="mt-auto flex flex-col pt-4 border-t border-gray-200">
+            {/* Controls section - Theme toggle & bottom routes */}
+            <div className={`flex flex-col ${isExpanded ? 'justify-between px-3' : 'justify-center'} items-center mb-4`}>
+              {/* Theme toggle with consistent styling */}
+              <div className={`${isExpanded ? 'mr-2' : ''}  m-4`}>
+                <ModeToggle isExpanded={isExpanded} />
               </div>
               
-              {bottomRoutes.map((route) => (
-                <div key={route.label} className="p-1">
-                  <DesktopSidebarItem
-                    href={route.href}
-                    label={route.label}
-                    icon={route.icon}
-                    active={route.active}
-                    onClick={route.onClick}
-                    isExpanded={isExpanded}
-                  />
-                </div>
-              ))}
+              {/* Bottom routes (like logout) with consistent styling */}
+              <div className={`flex ${isExpanded ? 'space-x-2' : 'flex-col space-y-2'}`}>
+                {bottomRoutes.map((route) => (
+                  <div key={route.label}>
+                    <DesktopSidebarItem
+                      href={route.href}
+                      label={route.label}
+                      icon={route.icon}
+                      active={route.active}
+                      onClick={route.onClick}
+                      isExpanded={isExpanded}
+                      compact={true}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
             
-            {/* User profile */}
+            {/* User profile - Consistently styled for both states */}
             <div
               onClick={() => setIsOpen(true)}
-              className="cursor-pointer hover:bg-gray-100 transition rounded-lg p-2 m-2 w-full flex items-center justify-center"
+              className={`
+                cursor-pointer hover:bg-gray-100 transition rounded-lg p-2 mx-2 mb-2
+                ${isExpanded ? 'flex items-center space-x-3' : 'flex justify-center'}
+              `}
               title="Edit profile"
             >
-              {isExpanded ? (
-                <div className="flex items-center space-x-3 w-full px-1">
-                  <div className="relative">
-                    <Avatar user={currentUser} />
-                    <span className="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-green-400 ring-2 ring-white"></span>
-                  </div>
-                  <div className="overflow-hidden">
-                    <p className="text-sm font-medium text-gray-700 truncate">{currentUser.username}</p>
-                    <p className="text-xs text-gray-500 truncate">{currentUser.email}</p>
-                  </div>
-                </div>
-              ) : (
-                <div className="relative">
-                  <Avatar user={currentUser} />
-                  <span className="absolute bottom-0 right-0 block h-2 w-2 rounded-full bg-green-400 ring-1 ring-white"></span>
+              <div className="relative">
+                <Avatar user={currentUser} />
+                <span className="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-green-400 ring-2 ring-white"></span>
+              </div>
+              
+              {isExpanded && (
+                <div className="overflow-hidden flex-1">
+                  <p className="text-sm font-medium text-gray-700 truncate">{currentUser.username}</p>
+                  <p className="text-xs text-gray-500 truncate">{currentUser.email}</p>
                 </div>
               )}
             </div>
