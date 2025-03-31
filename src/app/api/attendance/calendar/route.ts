@@ -4,12 +4,15 @@ import prisma from "@/lib/prismadb";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 
 export async function GET(req: Request) {
+
+  console.log("GETtting from /api/attendance/calendar but really ??");
   const session = await getServerSession(authOptions);
   if (!session || !session.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const { searchParams } = new URL(req.url);
+  console.log(searchParams)
   const userId = session.user.id;
   const year = parseInt(searchParams.get("year") || "");
   const month = parseInt(searchParams.get("month") || "");
