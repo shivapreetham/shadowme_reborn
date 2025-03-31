@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
+import clsx from 'clsx';
 
 interface ModeToggleProps {
   isExpanded?: boolean;
@@ -14,23 +15,27 @@ export function ModeToggle({ isExpanded }: ModeToggleProps) {
   return (
     <button
       onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-      className={`
-        flex items-center justify-center rounded-md transition-colors
-        bg-white shadow-sm hover:bg-gray-100
-        ${isExpanded ? 'px-3 py-2 w-full' : 'p-2 w-9 h-9'}
-      `}
+      className={clsx(
+        'flex items-center gap-x-2 rounded-md text-sm font-medium transition-all duration-200',
+        isExpanded ? 'p-2.5 justify-start w-full' : 'p-3 justify-center',
+        'bg-primary text-primary-foreground hover:brightness-110'
+      )}
       aria-label="Toggle theme"
     >
       {theme === 'dark' ? (
-        <div className="flex items-center">
-          <Sun size={18} className="text-amber-500" />
-          {isExpanded && <span className="ml-2 text-sm font-medium">Light</span>}
-        </div>
+        <>
+          <Sun size={20} className="shrink-0" aria-hidden="true" />
+          {isExpanded && (
+            <span className="whitespace-nowrap font-medium">Light Mode</span>
+          )}
+        </>
       ) : (
-        <div className="flex items-center">
-          <Moon size={18} className="text-indigo-500" />
-          {isExpanded && <span className="ml-2 text-sm font-medium">Dark</span>}
-        </div>
+        <>
+          <Moon size={20} className="shrink-0" aria-hidden="true" />
+          {isExpanded && (
+            <span className="whitespace-nowrap font-medium">Dark Mode</span>
+          )}
+        </>
       )}
     </button>
   );
