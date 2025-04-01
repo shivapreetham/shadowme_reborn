@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 @layer base {
   :root {
     /* Light theme with blue accents */
@@ -33,6 +34,7 @@
     --ring: 221 83% 53%;
   }
 }
+
 /* Hide scrollbars for all elements */
 * {
   scrollbar-width: none; /* For Firefox */
@@ -45,21 +47,32 @@
 }
 
 @layer utilities {
-  
-  /* Glass effect for cards */
+  /* Glass effect for cards with rounded corners */
   .glass-card {
-    @apply bg-background/50 backdrop-blur-sm;
+    @apply bg-background/50 backdrop-blur-sm rounded-xl shadow-md transition-all duration-200;
     border: 1px solid rgb(var(--primary) / 0.1);
   }
 
   .glass-card:hover {
+    @apply shadow-lg;
     border-color: rgb(var(--primary) / 0.2);
+    transform: translateY(-2px);
   }
-
   
+  /* Soft rounded corners for buttons and inputs */
+  .btn, button, input, select, textarea {
+    @apply rounded-md;
+  }
+  
+  /* Add subtle hover effects */
+  .hover-lift {
+    @apply transition-transform duration-200;
+  }
+  
+  .hover-lift:hover {
+    transform: translateY(-2px);
+  }
 }
-
-
 
 @layer base {
   * {
@@ -67,5 +80,15 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+  
+  /* Soften all corners by default */
+  div, section, aside, main, nav, header, footer {
+    @apply rounded-lg;
+  }
+  
+  /* Add subtle animations for better UX */
+  button, a, input, select {
+    @apply transition-all duration-200;
   }
 }
