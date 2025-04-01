@@ -1,84 +1,146 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import Link from "next/link";
+import { ArrowRight, MessageSquare, Video, Calendar, ShoppingBag } from "lucide-react";
 
-export default function HomePage() {
-  const router = useRouter();
-
+export default function Home() {
   return (
-    <main className="relative min-h-screen bg-gray-100">
-      {/* Top banner text */}
-      <div className="absolute top-0 left-0 w-full bg-white shadow p-4 z-10 text-center">
-        <h1 className="text-2xl font-bold">
-          Get your app for NIT Jamshedpur – integrate with ours, let’s get big together!
-        </h1>
-      </div>
-
-      {/* Main container for the 5 sections */}
-      <div className="relative h-screen flex items-center justify-center">
-        {/* Grid container */}
-        <div className="relative w-full max-w-6xl h-[80vh] grid grid-cols-12 grid-rows-6 gap-4">
-          {/* Top Left: AI Chat */}
-          <Card className="col-span-3 row-span-3 flex flex-col justify-center items-center p-6 shadow-lg">
-            <h2 className="text-xl font-semibold mb-2">AI Chat</h2>
-            <p className="text-sm text-gray-600 text-center mb-4">
-              Chat powered by AI. Chat with your friends!
-            </p>
-            <Button onClick={() => router.push("/conversations")}>
-              Go to Chat
-            </Button>
-          </Card>
-
-          {/* Top Right: Anonymous Video Chat */}
-          <Card className="col-span-3 col-start-10 row-span-3 flex flex-col justify-center items-center p-6 shadow-lg">
-            <h2 className="text-xl font-semibold mb-2">Anonymous Video Chat</h2>
-            <p className="text-sm text-gray-600 text-center mb-4">
-              Video chat with your friends with hidden identity and exciting filters!
-            </p>
-            <Button onClick={() => router.push("/video-chat")}>
-              Start Video Chat
-            </Button>
-          </Card>
-
-          {/* Bottom Left: Attendance */}
-          <Card className="col-span-5 row-span-3 row-start-4 flex flex-col justify-center items-center p-6 shadow-lg">
-            <h2 className="text-xl font-semibold mb-2">Attendance</h2>
-            <p className="text-sm text-gray-600 text-center mb-4">
-              See and monitor your attendance, compete with your mates and check your daily stats!
-            </p>
-            <Button onClick={() => router.push("/attendance")}>
-              Check Attendance
-            </Button>
-          </Card>
-
-          {/* Bottom Right: OLX for NIT JSR */}
-          <Card className="col-span-5 col-start-8 row-span-3 row-start-4 flex flex-col justify-center items-center p-6 shadow-lg">
-            <h2 className="text-xl font-semibold mb-2">NITJSR OLX</h2>
-            <p className="text-sm text-gray-600 text-center mb-4">
-              A second-hand shop for NIT Jamshedpur. Sell, buy & reuse your items!
-            </p>
-            <Button onClick={() => router.push("/olx")}>
-              Go to Marketplace
-            </Button>
-          </Card>
-
-          {/* Center Circle: Get Started Now */}
-          <div className="col-span-4 col-start-5 row-span-2 row-start-3 flex items-center justify-center">
+    <div className="min-h-screen bg-gray-400 p-6 flex items-center justify-center">
+      <div className="w-full max-w-7xl relative">
+        
+        <div className="grid grid-cols-5 gap-0 relative h-[600px]">
+          {/* === CENTER CIRCLE (overlapping both rows) === */}
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
             <div className="relative">
-              {/* Background gradient circle */}
-              <div className="absolute inset-0 w-64 h-64 bg-gradient-to-b from-gray-300 to-transparent rounded-full blur-2xl" />
-              <Button
-                className="w-40 h-40 rounded-full text-xl font-bold z-10"
-                onClick={() => alert("Get Started Now!")}
+              {/* Halo around circle */}
+              <div className="w-48 h-48 bg-gray-300 rounded-full absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+              {/* Main circle */}
+              <div className="w-36 h-36 bg-blue-700 rounded-full flex items-center justify-center shadow-lg relative z-10">
+                <div className="text-white font-bold text-center">
+                  <div className="text-xl">GET</div>
+                  <div className="text-xl">STARTED</div>
+                  <div className="text-xl">NOW</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* === TOP LEFT (col 1) => Smart Chat === */}
+          <div className="col-span-1 bg-white border-2 border-blue-500 shadow-md p-6 rounded-tl-xl">
+            <MessageSquare className="text-blue-600 mb-4 h-10 w-10" />
+            <h2 className="text-xl font-bold text-slate-800 mb-2">Smart Chat</h2>
+            <p className="text-slate-600 mb-4">
+              Chat with friends using our AI-powered messaging system
+            </p>
+            <Link
+              href="/conversations"
+              className="inline-flex items-center text-blue-600 font-medium hover:text-blue-800"
+            >
+              Start chatting <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+          </div>
+
+          {/* === TOP CENTER (col 2-4) => Banner === */}
+          <div className="col-span-3 bg-gray-300 shadow-md p-6 flex flex-col items-center justify-center">
+            <h3 className="text-xl font-medium text-slate-800 mb-2 text-center">
+              Get your app for NIT Jamshedpur
+            </h3>
+            <p className="text-slate-600 text-center">
+              Integrate with ours, let&apos;s get big together
+            </p>
+          </div>
+
+          {/* === TOP RIGHT (col 5) => Anonymous Video === */}
+          <div className="col-span-1 bg-gray-500 shadow-md p-6 rounded-tr-xl">
+            <Video className="text-white mb-4 h-10 w-10" />
+            <h2 className="text-xl font-bold text-white mb-2">Anonymous Video</h2>
+            <p className="text-gray-200 mb-4">
+              Voice and video with identity hidden, exciting filters included
+            </p>
+            <Link
+              href="/video"
+              className="inline-flex items-center text-white font-medium hover:text-gray-200"
+            >
+              Start a call <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+          </div>
+
+          {/* === BOTTOM ROW (col-span-5) => 2 flexible columns side by side === */}
+          <div className="col-span-5 flex">
+            {/* Bottom Left => Attendance Tracker */}
+            <div className="flex-1 bg-gray-200 shadow-md p-6 rounded-bl-xl">
+              <Calendar className="text-blue-600 mb-4 h-10 w-10" />
+              <h2 className="text-xl font-bold text-slate-800 mb-2">
+                Attendance Tracker
+              </h2>
+              <p className="text-slate-600 mb-4">
+                Monitor attendance, compete with classmates, and track
+                your daily progress
+              </p>
+              <div className="mb-4">
+                <div className="flex justify-between text-slate-700 text-sm mb-1">
+                  <span>Your attendance</span>
+                  <span>85%</span>
+                </div>
+                <div className="w-full bg-gray-300 rounded-full h-2">
+                  <div
+                    className="bg-blue-600 h-2 rounded-full"
+                    style={{ width: "85%" }}
+                  />
+                </div>
+              </div>
+              <Link
+                href="/attendance"
+                className="inline-flex items-center text-blue-600 font-medium hover:text-blue-800"
               >
-                Get Started Now
-              </Button>
+                View details <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </div>
+
+            {/* Bottom Right => Campus Marketplace */}
+            <div className="flex-1 bg-white shadow-md p-6 rounded-br-xl">
+              <div className="flex justify-end">
+                <ShoppingBag className="text-blue-600 mb-4 h-10 w-10" />
+              </div>
+              <h2 className="text-xl font-bold text-slate-800 mb-2 text-right">
+                Campus Marketplace
+              </h2>
+              <p className="text-slate-600 mb-4 text-right">
+                Buy and sell second-hand items exclusively for NIT Jamshedpur students
+              </p>
+              <div className="grid grid-cols-3 gap-3 mb-4">
+                <div className="bg-gray-100 rounded-lg p-2 aspect-square flex items-center justify-center shadow-sm">
+                  <span className="text-slate-700 text-xs font-medium">Laptop</span>
+                </div>
+                <div className="bg-gray-100 rounded-lg p-2 aspect-square flex items-center justify-center shadow-sm">
+                  <span className="text-slate-700 text-xs font-medium">Books</span>
+                </div>
+                <div className="bg-gray-100 rounded-lg p-2 aspect-square flex items-center justify-center shadow-sm">
+                  <span className="text-slate-700 text-xs font-medium">Furniture</span>
+                </div>
+              </div>
+              <div className="flex justify-end">
+                <Link
+                  href="/olx"
+                  className="inline-flex items-center text-blue-600 font-medium hover:text-blue-800"
+                >
+                  Browse marketplace <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </div>
             </div>
           </div>
         </div>
+
+        {/* Extra Footer / Suggestion Link */}
+        <div className="mt-8 text-center">
+          <p className="text-slate-700">
+            Want to add a feature?{" "}
+            <Link href="/suggest" className="text-blue-600 hover:underline">
+              Let us know
+            </Link>
+          </p>
+        </div>
       </div>
-    </main>
+    </div>
   );
 }
