@@ -14,7 +14,7 @@ interface DesktopSidebarProps {
 }
 
 const DesktopSidebar: React.FC<DesktopSidebarProps> = ({ currentUser }) => {
-  const { routes, isVideoChat, isAttendance } = useRoutes();
+  const { routes} = useRoutes();
   const [isOpen, setIsOpen] = useState(false);
   const { theme } = useTheme();
   const isDark = theme === 'dark';

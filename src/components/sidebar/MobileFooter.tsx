@@ -17,7 +17,7 @@ const MobileFooter = () => {
   ).slice(0, 4); // Limit to prevent overcrowding
 
   return (
-    <div className="fixed justify-between w-full bottom-0 z-40 flex items-center bg-background/80 backdrop-blur-md border-t border-border lg:hidden transition-colors duration-300 px-1">
+    <div className="fixed justify-between w-full bottom-0 z-40 flex items-center bg-background/50 backdrop-blur-xl border-t border-border/30 lg:hidden transition-colors duration-300 px-1 glass-card">
       {mobileRoutes.map((route) => (
         <MobileFooterItem
           key={route.label}
