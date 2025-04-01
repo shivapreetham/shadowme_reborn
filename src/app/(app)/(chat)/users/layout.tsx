@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import getUsers from '@/app/actions/getUsers';
-import Sidebar from '@/components/chat/sidebar/Sidebar';
+import Sidebar from '@/components/sidebar/Sidebar';
 import UserList from './components/UserList';
 
 export const metadata: Metadata = {
