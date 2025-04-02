@@ -24,7 +24,6 @@ model User {
   branch                       String?
   loginDays                    Int?
   loginStreak                  Int?
-  avatar                       String?
   honorScore                   Int                 @default(100)
   lastSeen                     DateTime            @default(now())
   activeStatus                 Boolean             @default(false)
@@ -33,9 +32,9 @@ model User {
   anonymousMessages            AnonymousMessage[]
   
   // Conversations and messages
-  conversationIds              String[]            @db.ObjectId @default([])
+  conversationIds              String[]            @db.ObjectId
   conversations                Conversation[]      @relation(fields: [conversationIds], references: [id])
-  seenMessageIds               String[]            @db.ObjectId @default([])
+  seenMessageIds               String[]            @db.ObjectId
   seenMessages                 Message[]           @relation("Seen", fields: [seenMessageIds], references: [id])
   messages                     Message[]
   
@@ -48,6 +47,15 @@ model User {
   // Attendance Records
   attendanceRecords            Attendance[]
   dailyAttendanceRecords       DailyAttendance[]
+
+  // Additional fields
+  mobileNumber                 String?
+  hostel                       String?
+  
+  // Products relations
+  products                     Product[]
+  interestedProductIds         String[]            @db.ObjectId
+  interestedProducts           Product[]           @relation("InterestedProducts", fields: [interestedProductIds], references: [id])
 }
 
 model AnonymousMessage {
@@ -154,3 +162,43 @@ model DailyAttendanceSubject {
   dailyAttendanceId   String            @db.ObjectId
   dailyAttendance     DailyAttendance   @relation(fields: [dailyAttendanceId], references: [id], onDelete: Cascade)
 }
+
+
+enum ProductStatus {
+  AVAILABLE
+  RESERVED
+  SOLD
+}
+
+model Product {
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String
+  price       Float
+  status      ProductStatus @default(AVAILABLE)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  
+  // Product details
+  category    String
+  condition   String?       // Like new, good, fair, etc.
+  
+  // Location info
+  hostel      String?
+  
+  // Images
+  mainImage   String
+  images      String[]      // Additional product images
+  
+  // QR code for payments
+  paymentQR   String?
+  
+  // Seller information
+  sellerId    String        @db.ObjectId
+  seller      User          @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  
+  // Interested buyers
+  interestedUserIds String[] @db.ObjectId
+  interestedUsers   User[]   @relation("InterestedProducts", fields: [interestedUserIds], references: [id])
+}
+
