@@ -5,7 +5,7 @@ import { ArrowRight, MessageSquare, Video, Calendar, ShoppingBag } from "lucide-
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gray-400 p-4 flex flex-col items-center">
+    <div className="min-h-screen bg-white p-4 flex flex-col items-center">
       <div className="w-full max-w-7xl relative">
         {/* Header */}
         <div className="text-center mb-6">

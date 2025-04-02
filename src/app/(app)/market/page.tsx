@@ -3,7 +3,8 @@
 
 import { useEffect, useState } from "react";
 import { Product, PRODUCT_CATEGORIES } from "@/types/products";
-import { ProductCard } from "@/components/products/productCard";
+
+import { ProductCard } from "@/components/products/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -87,20 +88,20 @@ export default function MarketPage() {
 
       <div className="flex flex-wrap gap-3 mb-6">
         <div className="flex-1 min-w-[200px]">
-          <Select 
-            value={category || ""} 
-            onValueChange={handleCategoryChange}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="All Categories" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="">All Categories</SelectItem>
-              {PRODUCT_CATEGORIES.map((cat:any) => (
-                <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        <Select 
+  value={category || "all"} 
+  onValueChange={handleCategoryChange}
+>
+  <SelectTrigger>
+    <SelectValue placeholder="All Categories" />
+  </SelectTrigger>
+  <SelectContent>
+    <SelectItem value="all">All Categories</SelectItem> {/* Fix: Replaced "" with "all" */}
+    {PRODUCT_CATEGORIES.map((cat:any) => (
+      <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+    ))}
+  </SelectContent>
+</Select>
         </div>
         <div className="w-24">
           <Input

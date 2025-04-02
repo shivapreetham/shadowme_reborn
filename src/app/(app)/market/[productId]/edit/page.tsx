@@ -6,7 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { PRODUCT_CATEGORIES, PRODUCT_CONDITIONS, Product } from "@/types/product";
+import { PRODUCT_CATEGORIES, PRODUCT_CONDITIONS, Product } from "@/types/products";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -25,8 +25,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { toast } from "@/components/ui/use-toast";
-import { ImageUpload } from "@/components/ImageUpload";
+import { toast } from "@/app/hooks/use-toast";
+import { ImageUpload } from "@/components/imageUpload";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { ArrowLeft, Loader2, Trash } from "lucide-react";
 
@@ -310,7 +310,7 @@ export default function EditProductPage() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {PRODUCT_CATEGORIES.map((category) => (
+                        {PRODUCT_CATEGORIES.map((category: any) => (
                           <SelectItem key={category} value={category}>
                             {category}
                           </SelectItem>
@@ -340,7 +340,7 @@ export default function EditProductPage() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {PRODUCT_CONDITIONS.map((condition) => (
+                        {PRODUCT_CONDITIONS.map((condition : any) => (
                           <SelectItem key={condition} value={condition}>
                             {condition}
                           </SelectItem>

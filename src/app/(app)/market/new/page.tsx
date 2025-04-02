@@ -26,7 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "@/app/hooks/use-toast";
-import { ImageUpload } from "@/components/ImageUpload";
+import { ImageUpload } from "@/components/imageUpload";
 import { ArrowLeft, Loader2 } from "lucide-react";
 
 // Create form schema

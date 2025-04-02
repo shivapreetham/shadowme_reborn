@@ -10,7 +10,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { image, username, NITUsername, NITPassword } = body;
+    const { image, username, NITUsername, NITPassword, mobileNumber, hostel } = body;
     
     // Create an object with only the fields to update
     const updateData: any = {};
@@ -19,6 +19,8 @@ export async function POST(request: Request) {
     if (username !== undefined) updateData.username = username;
     if (NITUsername !== undefined) updateData.NITUsername = NITUsername;
     if (NITPassword !== undefined) updateData.NITPassword = NITPassword;
+    if (mobileNumber !== undefined) updateData.mobileNumber = mobileNumber;
+    if (hostel !== undefined) updateData.hostel = hostel;
     
     // Only update if there are changes
     if (Object.keys(updateData).length === 0) {

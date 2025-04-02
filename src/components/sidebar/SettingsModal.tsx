@@ -55,6 +55,10 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   const [username, setUsername] = useState(currentUser?.username || '');
   const [NITUsername, setNITUsername] = useState(currentUser?.NITUsername || '');
   const [NITPassword, setNITPassword] = useState(currentUser?.NITPassword || '');
+  // Additional fields
+  const [mobileNumber, setMobileNumber] = useState(currentUser?.mobileNumber || '');
+  const [hostel, setHostel] = useState(currentUser?.hostel || '');
+  
   const [activeTab, setActiveTab] = useState('profile');
   const [uploadProgress, setUploadProgress] = useState(0);
 
@@ -177,6 +181,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
         username?: string;
         NITUsername?: string;
         NITPassword?: string;
+        mobileNumber?: string;
+        hostel?: string;
       } = {};
       
       // Only include fields that have changed
@@ -184,6 +190,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
       if (username !== currentUser.username) updateData.username = username;
       if (NITUsername !== currentUser.NITUsername) updateData.NITUsername = NITUsername;
       if (NITPassword !== currentUser.NITPassword) updateData.NITPassword = NITPassword;
+      if (mobileNumber !== currentUser.mobileNumber) updateData.mobileNumber = mobileNumber;
+      if (hostel !== currentUser.hostel) updateData.hostel = hostel;
       
       // Only proceed if there are changes
       if (Object.keys(updateData).length === 0) {
@@ -237,7 +245,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
           <X className="h-5 w-5 text-gray-500 dark:text-gray-400" />
         </button>
 
-        <div className="space-y-6 relative z-10">
+        <div className="space-y-2 relative z-10">
           {/* Header */}
           <div className="space-y-2">
             <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">Profile Settings</h2>
@@ -257,7 +265,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
               Profile
             </button>
             <button
-              className={`flex-1 py-2 font-medium text-sm rounded-full transition-all duration-200 ${
+              className={`flex-1 py-1 font-medium text-sm rounded-full transition-all duration-200 ${
                 activeTab === 'credentials'
                   ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm'
                   : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
@@ -271,7 +279,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
           {activeTab === 'profile' && (
             <>
               {/* Profile Picture Section */}
-              <div className="flex flex-col items-center space-y-4">
+              <div className="flex flex-col items-center space-y-2">
                 <div className="relative h-32 w-32 group">
                   <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 opacity-30 blur-sm animate-pulse-slow"></div>
                   {image ? (
@@ -295,7 +303,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                       className="hidden"
                       disabled={isLoading}
                     />
-                    <div className="bg-black/50 rounded-full p-3 backdrop-blur-sm transform group-hover:scale-110 transition-transform duration-300">
+                    <div className="bg-black/50 rounded-full p-2 backdrop-blur-sm transform group-hover:scale-110 transition-transform duration-300">
                       <Upload className="h-5 w-5 text-white" />
                     </div>
                   </label>
@@ -310,12 +318,12 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                         style={{ width: `${uploadProgress}%` }}
                       />
                     </div>
-                    <p className="text-xs text-center mt-1 text-gray-500">Uploading: {uploadProgress}%</p>
+                    <p className="text-xs text-center  text-gray-500">Uploading: {uploadProgress}%</p>
                   </div>
                 )}
                 
                 {/* Username field */}
-                <div className="w-full space-y-2">
+                <div className="w-full space-y-1">
                   <Label htmlFor="username" className="text-sm font-medium text-gray-700 dark:text-gray-300">Username</Label>
                   <Input
                     id="username"
@@ -325,11 +333,31 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                     className="rounded-xl border-gray-200/80 dark:border-gray-700/50 bg-white/60 dark:bg-gray-800/50 backdrop-blur-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 transition-all duration-200"
                   />
                 </div>
+                <div className="w-full space-y-1">
+                  <Label htmlFor="mobileNumber" className="text-sm font-medium text-gray-700 dark:text-gray-300">Mobile Number</Label>
+                  <Input
+                    id="mobileNumber"
+                    value={mobileNumber}
+                    onChange={(e) => setMobileNumber(e.target.value)}
+                    placeholder="Enter your mobile number"
+                    className="rounded-xl border-gray-200/80 dark:border-gray-700/50 bg-white/60 dark:bg-gray-800/50 backdrop-blur-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 transition-all duration-200"
+                  />
+                </div>
+                <div className="w-full space-y-1">
+                  <Label htmlFor="hostel" className="text-sm font-medium text-gray-700 dark:text-gray-300">Hostel</Label>
+                  <Input
+                    id="hostel"
+                    value={hostel}
+                    onChange={(e) => setHostel(e.target.value)}
+                    placeholder="Enter your hostel"
+                    className="rounded-xl border-gray-200/80 dark:border-gray-700/50 bg-white/60 dark:bg-gray-800/50 backdrop-blur-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 transition-all duration-200"
+                  />
+                </div>
               </div>
 
               {/* User Details */}
               {userDetails && (
-                <div className="grid grid-cols-2 gap-4 pt-4">
+                <div className="grid grid-cols-2 gap-2 pt-4">
                   <div className="space-y-1 text-center p-4 bg-white/60 dark:bg-gray-800/40 rounded-2xl shadow-sm backdrop-blur-sm border border-gray-100 dark:border-gray-700/30 hover:shadow-md transition-all duration-200">
                     <div className="text-sm font-medium text-gray-500 dark:text-gray-400">Batch</div>
                     <div className="font-semibold text-gray-900 dark:text-gray-100">{userDetails.batch}</div>

@@ -7,9 +7,10 @@ import { Progress } from "@/components/ui/progress";
 import { toast } from "@/app/hooks/use-toast";
 import { X, Upload, Loader2 } from "lucide-react";
 
-// Initialize Supabase client from environment variables
+// Initialize Supabase client with service key (like in your SettingsModal)
+// WARNING: Using the service key on the client side can expose elevated privileges.
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_SERVICE_KEY || "";
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 interface ImageUploadProps {
