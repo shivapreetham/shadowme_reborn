@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import MeetingTypeList from '@/components/videoChat/MeetingTypeList';
 import { useRouter } from 'next/navigation';
 import { useStreamVideoClient } from '@stream-io/video-react-sdk';
@@ -11,7 +11,6 @@ import { Button } from '@/components/ui/button';
 import { useGetCallById } from '@/app/hooks/useGetCallById';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { useGetCalls } from '@/app/hooks/useGetCalls';
-import MeetingCard from './MeetingCard';
 import Loader from '@/components/videoChat/Loader';
 import CallList from '@/components/videoChat/CallList';
 
