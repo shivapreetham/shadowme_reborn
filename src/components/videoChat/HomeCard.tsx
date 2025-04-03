@@ -1,35 +1,37 @@
 'use client';
 
-import Image from 'next/image';
-
-import { cn } from '@/lib/utils';
-
 interface HomeCardProps {
   className?: string;
-  img: string;
   title: string;
   description: string;
   handleClick?: () => void;
+  icon:any;
 }
-
-const HomeCard = ({ className, img, title, description, handleClick }: HomeCardProps) => {
+// Update to your HomeCard component
+const HomeCard: React.FC<HomeCardProps> = ({ 
+  className = "", 
+  title, 
+  description, 
+  handleClick,
+  icon // Replace img with icon
+}) => {
   return (
-    <section
-      className={cn(
-        'bg-orange-1 px-4 py-6 flex flex-col justify-between w-full xl:max-w-[270px] min-h-[260px] rounded-[14px] cursor-pointer',
-        className
-      )}
+    <div 
+      className={`flex cursor-pointer flex-col gap-4 rounded-xl p-6 transition-all hover:opacity-80 ${className}`}
       onClick={handleClick}
     >
-      <div className="flex-center glassmorphism size-12 rounded-[10px]">
-        <Image src={img} alt="meeting" width={27} height={27} />
+      <div className="flex items-center justify-between">
+        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white bg-opacity-40 backdrop-blur-sm shadow-sm">
+          {icon}
+        </div>
+        <div className="h-8 w-8 rounded-full bg-white bg-opacity-30"></div>
       </div>
       
-      <div className="flex flex-col gap-2">
-        <h1 className="text-2xl font-bold">{title}</h1>
-        <p className="text-lg font-normal">{description}</p>
+      <div>
+        <h3 className="text-base font-medium">{title}</h3>
+        <p className="text-sm text-gray-600">{description}</p>
       </div>
-    </section>
+    </div>
   );
 };
 

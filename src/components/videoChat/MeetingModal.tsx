@@ -1,43 +1,55 @@
-'use client';
-import { ReactNode } from 'react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import Image from 'next/image';
+"use client";
 
-interface MeetingModalProps {
+import React from "react";
+import clsx from "clsx";
+
+export interface MeetingModalProps {
   isOpen: boolean;
   onClose: () => void;
   title: string;
-  className?: string;
-  children?: ReactNode;
-  handleClick?: () => void;
+  children: React.ReactNode;
+  handleClick: () => void;
   buttonText?: string;
-  instantMeeting?: boolean;
-  image?: string;
+  buttonIcon?: React.ReactNode;
   buttonClassName?: string;
-  buttonIcon?: string;
+  className?: string;
+  icon?: React.ReactNode;
 }
 
-const MeetingModal = ({ isOpen, onClose, title, className, children, handleClick, buttonText, image, buttonIcon }: MeetingModalProps) => {
+const MeetingModal: React.FC<MeetingModalProps> = ({
+  isOpen,
+  onClose,
+  title,
+  children,
+  handleClick,
+  buttonText,
+  buttonIcon,
+  buttonClassName,
+  className,
+  icon,
+}) => {
+  if (!isOpen) return null;
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="flex w-full max-w-[520px] flex-col gap-6 border-none bg-dark-1 px-6 py-9 text-white">
-        <div className="flex flex-col gap-6">
-          {image && (
-            <div className="flex justify-center">
-              <Image src={image} alt="checked" width={72} height={72} />
-            </div>
-          )}
-          <h1 className={cn('text-3xl font-bold leading-[42px]', className)}>{title}</h1>
-          {children}
-          <Button className={'bg-blue-1 focus-visible:ring-0 focus-visible:ring-offset-0'} onClick={handleClick}>
-            {buttonIcon && <Image src={buttonIcon} alt="button icon" width={13} height={13} />} &nbsp;
-            {buttonText || 'Schedule Meeting'}
-          </Button>
+    <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+      <div className={clsx("rounded-xl p-6 shadow-lg bg-white", className)}>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-bold">{title}</h2>
+          <button onClick={onClose}>
+            <span className="text-2xl">&times;</span>
+          </button>
         </div>
-      </DialogContent>
-    </Dialog>
+        {icon && <div className="mb-4">{icon}</div>}
+        <div>{children}</div>
+        <button
+          onClick={handleClick}
+          className={clsx("mt-4 w-full py-2 rounded", buttonClassName)}
+        >
+          {buttonIcon && <span className="mr-2 inline-block">{buttonIcon}</span>}
+          {buttonText}
+        </button>
+      </div>
+    </div>
   );
 };
 
