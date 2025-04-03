@@ -1,4 +1,3 @@
-// app/market/[productId]/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -10,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Loader2, Heart, Phone, MapPin, ArrowLeft, Edit, Check, ShoppingBag, Calendar } from "lucide-react";
+import { Loader2, Heart, Phone, MapPin, ArrowLeft, Edit, Check, ShoppingBag, Calendar, MessageCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
@@ -23,6 +22,7 @@ export default function ProductDetailPage() {
   const [isInterested, setIsInterested] = useState(false);
   const [interestLoading, setInterestLoading] = useState(false);
   const [statusLoading, setStatusLoading] = useState(false);
+  const [chatLoading, setChatLoading] = useState(false);
   const params = useParams();
   const router = useRouter();
   const { data: session } = useSession();
@@ -100,6 +100,40 @@ export default function ProductDetailPage() {
       console.error("Failed to update status:", error);
     } finally {
       setStatusLoading(false);
+    }
+  };
+
+  const chatWithSeller = async () => {
+    if (!session || !product) {
+      router.push("/login");
+      return;
+    }
+    
+    // Don't allow chatting with yourself
+    if (session.user?.id === product.sellerId) return;
+    
+    setChatLoading(true);
+    try {
+      // Try to find or create a conversation with the seller
+      const response = await fetch("/api/chat/conversations/find-or-create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: product.sellerId,
+          productTitle: product.title, // Optional: to mention the product in first message
+        }),
+      });
+
+      if (response.ok) {
+        const { conversationId } = await response.json();
+        router.push(`/user/conversations/${conversationId}`);
+      }
+    } catch (error) {
+      console.error("Failed to start conversation:", error);
+    } finally {
+      setChatLoading(false);
     }
   };
 
@@ -329,32 +363,54 @@ export default function ProductDetailPage() {
                 </div>
               )}
               
-              {/* Interest button (only for non-owners and available products) */}
-              {!isOwner && product.status === "AVAILABLE" && (
-                <Button
-                  variant={isInterested ? "default" : "outline"}
-                  className="w-full rounded-xl h-12 text-base shadow-lg hover:shadow-xl transition-all duration-300"
-                  onClick={toggleInterest}
-                  disabled={interestLoading}
-                >
-                  {interestLoading ? (
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  ) : (
-                    <>
-                      {isInterested ? (
-                        <>
-                          <Check className="mr-2 h-5 w-5" />
-                          Interested
-                        </>
+              {/* Action buttons for non-owners */}
+              {!isOwner && (
+                <div className="flex flex-col gap-3">
+                  {/* Interest button (only for available products) */}
+                  {product.status === "AVAILABLE" && (
+                    <Button
+                      variant={isInterested ? "default" : "outline"}
+                      className="w-full rounded-xl h-12 text-base shadow-lg hover:shadow-xl transition-all duration-300"
+                      onClick={toggleInterest}
+                      disabled={interestLoading}
+                    >
+                      {interestLoading ? (
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                       ) : (
                         <>
-                          <Heart className="mr-2 h-5 w-5" />
-                          I am Interested
+                          {isInterested ? (
+                            <>
+                              <Check className="mr-2 h-5 w-5" />
+                              Interested
+                            </>
+                          ) : (
+                            <>
+                              <Heart className="mr-2 h-5 w-5" />
+                              I am Interested
+                            </>
+                          )}
                         </>
                       )}
-                    </>
+                    </Button>
                   )}
-                </Button>
+                  
+                  {/* Chat with seller button */}
+                  <Button
+                    variant="secondary"
+                    className="w-full rounded-xl h-12 text-base shadow-lg hover:shadow-xl transition-all duration-300"
+                    onClick={chatWithSeller}
+                    disabled={chatLoading}
+                  >
+                    {chatLoading ? (
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    ) : (
+                      <>
+                        <MessageCircle className="mr-2 h-5 w-5" />
+                        Chat with Seller
+                      </>
+                    )}
+                  </Button>
+                </div>
               )}
             </div>
           </div>

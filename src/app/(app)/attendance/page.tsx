@@ -124,6 +124,8 @@ export default function AttendanceDashboard() {
   const [viewMode, setViewMode] = useState<"overview" | "detailed" | "trends">("overview");
   const [filterPeriod, setFilterPeriod] = useState<"week" | "month" | "semester">("month");
 
+
+
   // Calculate if it's dark mode for chart styling
   const isDarkTheme = theme === 'dark';
 
