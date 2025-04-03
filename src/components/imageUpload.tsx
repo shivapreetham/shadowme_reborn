@@ -1,206 +1,387 @@
-import React, { useState, useCallback } from "react";
+// components/imageUpload.tsx
+"use client";
+
+import { useState } from "react";
+import { Upload, X, Loader2, Check } from "lucide-react";
 import Image from "next/image";
-import { createClient } from "@supabase/supabase-js";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { toast } from "@/app/hooks/use-toast";
-import { X, Upload, Loader2 } from "lucide-react";
 
-// Initialize Supabase client with service key (like in your SettingsModal)
-// WARNING: Using the service key on the client side can expose elevated privileges.
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_SERVICE_KEY || "";
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Common types
+type UploadStatus = "idle" | "uploading" | "success" | "error";
 
-interface ImageUploadProps {
-  value: string[];
-  onChange: (url: string) => void;
-  onRemove: (url: string) => void;
-  disabled?: boolean;
-  multiple?: boolean;
-  bucket?: string;
-  maxSize?: number; // in MB
+interface UploadResponse {
+  url: string;
+  success: boolean;
+  error?: string;
 }
 
-export const ImageUpload: React.FC<ImageUploadProps> = ({
-  value = [],
-  onChange,
-  onRemove,
-  disabled = false,
-  multiple = false,
-  bucket = "product-images",
-  maxSize = 5, // Default max size 5MB
-}) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
+// Main Image Upload Component
+interface MainImageUploadProps {
+  value: string;
+  onChange: (url: string) => void;
+  onRemove: () => void;
+}
 
-  const handleUpload = useCallback(
-    async (file: File) => {
-      setIsLoading(true);
-      setUploadProgress(10);
+export const MainImageUpload = ({ value, onChange, onRemove }: MainImageUploadProps) => {
+  const [status, setStatus] = useState<UploadStatus>("idle");
+  const [error, setError] = useState<string | null>(null);
 
-      try {
-        // Validate file type and size
-        if (!file.type.startsWith("image/")) {
-          throw new Error("Please select a valid image file");
-        }
-        if (file.size > maxSize * 1024 * 1024) {
-          throw new Error(`File size must be less than ${maxSize}MB`);
-        }
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-        setUploadProgress(30);
-
-        // Create a unique file path
-        const fileExtension = file.name.split(".").pop() || "jpg";
-        const fileName = `upload-${Date.now()}-${Math.random()
-          .toString(36)
-          .substring(2, 15)}.${fileExtension}`;
-
-        setUploadProgress(50);
-
-        // Upload to Supabase storage
-        const { error: uploadError } = await supabase.storage
-          .from(bucket)
-          .upload(fileName, file, {
-            cacheControl: "3600",
-            upsert: false,
-          });
-
-        if (uploadError) {
-          console.error("Upload error:", uploadError);
-          throw uploadError;
-        }
-
-        setUploadProgress(80);
-
-        // Retrieve the public URL for the uploaded image
-        const { data } = supabase.storage.from(bucket).getPublicUrl(fileName);
-        const publicUrl = data.publicUrl;
-
-        setUploadProgress(100);
-
-        // Pass the URL back to the parent component
-        onChange(publicUrl);
-
-        toast({
-          title: "Success",
-          description: "Image uploaded successfully.",
-        });
-      } catch (error: any) {
-        console.error("Upload failed:", error);
-        toast({
-          variant: "destructive",
-          title: "Upload failed",
-          description: error.message || "Something went wrong",
-        });
-      } finally {
-        setIsLoading(false);
-        setUploadProgress(0);
-      }
-    },
-    [bucket, maxSize, onChange]
-  );
-
-  const handleFileSelect = useCallback(
-    async (event: React.ChangeEvent<HTMLInputElement>) => {
-      const files = event.target.files;
-      if (!files || files.length === 0) return;
-
-      if (multiple) {
-        // Process each file sequentially
-        for (const file of Array.from(files)) {
-          await handleUpload(file);
-        }
-      } else {
-        await handleUpload(files[0]);
-      }
-      // Reset the input value to allow re-uploading the same file if needed
-      event.target.value = "";
-    },
-    [handleUpload, multiple]
-  );
-
-  const handleButtonClick = useCallback(() => {
-    const fileInput = document.getElementById(`fileUpload-${bucket}`) as HTMLInputElement;
-    if (fileInput) {
-      fileInput.click();
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      setError("Please upload an image file");
+      return;
     }
-  }, [bucket]);
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setError("Image size must be less than 5MB");
+      return;
+    }
+
+    setStatus("uploading");
+    setError(null);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("type", "main");
+
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data: UploadResponse = await response.json();
+
+      if (!data.success || !data.url) {
+        throw new Error(data.error || "Failed to upload image");
+      }
+
+      onChange(data.url);
+      setStatus("success");
+    } catch (error) {
+      console.error("Upload error:", error);
+      setError(error instanceof Error ? error.message : "Failed to upload image");
+      setStatus("error");
+    }
+  };
 
   return (
-    <div className="space-y-4">
-      {/* Upload button and progress */}
-      <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 p-6 rounded-lg">
-        {isLoading ? (
-          <div className="w-full space-y-4">
-            <div className="flex items-center justify-center">
-              <Loader2 className="h-6 w-6 animate-spin text-primary" />
-              <span className="ml-2 text-sm text-gray-600">Uploading...</span>
-            </div>
-            <Progress value={uploadProgress} className="h-2 w-full" />
-          </div>
-        ) : (
-          <div className="w-full">
-            <Button
-              type="button"
-              variant="outline"
-              disabled={disabled || isLoading}
-              onClick={handleButtonClick}
-              className="w-full h-24 flex flex-col gap-2"
-            >
-              <Upload className="h-6 w-6" />
-              <span>{multiple ? "Upload Images" : "Upload Image"}</span>
-              <p className="text-xs text-gray-500">
-                Max {maxSize}MB. JPG, PNG, GIF accepted.
-              </p>
-            </Button>
-            <input
-              id={`fileUpload-${bucket}`}
-              type="file"
-              accept="image/*"
-              multiple={multiple}
-              disabled={disabled || isLoading}
-              className="hidden"
-              onChange={handleFileSelect}
+    <div className="w-full">
+      {value ? (
+        <div className="relative">
+          <div className="aspect-square w-full relative rounded-lg overflow-hidden border border-blue-200">
+            <Image 
+              src={value} 
+              alt="Main product image" 
+              fill 
+              className="object-cover" 
             />
           </div>
-        )}
-      </div>
-
-      {/* Preview area */}
-      {value.length > 0 && (
-        <div
-          className={cn(
-            "grid gap-4",
-            multiple ? "grid-cols-2 md:grid-cols-3" : "grid-cols-1"
-          )}
-        >
-          {value.map((url) => (
-            <div
-              key={url}
-              className="relative aspect-square rounded-md overflow-hidden border border-gray-200"
-            >
-              <div className="absolute top-2 right-2 z-10">
-                <Button
-                  type="button"
-                  variant="destructive"
-                  size="icon"
-                  onClick={() => onRemove(url)}
-                  disabled={disabled}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
+          <button
+            type="button"
+            onClick={onRemove}
+            className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 w-8 h-8 flex items-center justify-center"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+      ) : (
+        <div className="w-full">
+          <div className="flex flex-col items-center justify-center border-2 border-dashed border-blue-300 rounded-lg p-6 text-center">
+            <Upload className="h-10 w-10 text-blue-500 mb-2" />
+            <p className="text-sm font-medium text-blue-700">
+              {status === "uploading" ? "Uploading..." : "Upload main product image"}
+            </p>
+            <p className="text-xs text-gray-500 mt-1">PNG, JPG, WEBP up to 5MB</p>
+            
+            <input
+              id="main-image-upload"
+              type="file"
+              accept="image/*"
+              onChange={handleUpload}
+              className="hidden"
+              disabled={status === "uploading"}
+            />
+            
+            <label htmlFor="main-image-upload" className="mt-4">
+              <div className={`cursor-pointer inline-flex items-center px-4 py-2 rounded-md text-sm font-medium transition-colors
+                ${status === "uploading" 
+                  ? "bg-blue-100 text-blue-700" 
+                  : "bg-blue-600 text-white hover:bg-blue-700"}`}
+              >
+                {status === "uploading" ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Uploading...
+                  </>
+                ) : (
+                  "Select Image"
+                )}
               </div>
-              <Image
-                fill
-                src={url}
-                alt="Upload"
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 33vw"
-              />
+            </label>
+            
+            {error && (
+              <p className="mt-2 text-sm text-red-600">{error}</p>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Additional Images Upload Component
+interface AdditionalImagesUploadProps {
+  value: string[];
+  onChange: (urls: string[]) => void;
+  onRemove: (url: string) => void;
+}
+
+export const AdditionalImagesUpload = ({ value, onChange, onRemove }: AdditionalImagesUploadProps) => {
+  const [status, setStatus] = useState<UploadStatus>("idle");
+  const [error, setError] = useState<string | null>(null);
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    // Check if adding these files would exceed the 5 image limit
+    if (value.length + files.length > 5) {
+      setError("You can upload a maximum of 5 additional images");
+      return;
+    }
+
+    setStatus("uploading");
+    setError(null);
+
+    const uploadPromises: Promise<string>[] = [];
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      
+      // Validate file type
+      if (!file.type.startsWith("image/")) {
+        setError("Please upload image files only");
+        setStatus("error");
+        return;
+      }
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setError("Each image must be less than 5MB");
+        setStatus("error");
+        return;
+      }
+
+      // Create upload promise
+      const uploadPromise = new Promise<string>(async (resolve, reject) => {
+        try {
+          const formData = new FormData();
+          formData.append("file", file);
+          formData.append("type", "additional");
+
+          const response = await fetch("/api/upload", {
+            method: "POST",
+            body: formData,
+          });
+
+          const data: UploadResponse = await response.json();
+
+          if (!data.success || !data.url) {
+            throw new Error(data.error || "Failed to upload image");
+          }
+
+          resolve(data.url);
+        } catch (error) {
+          reject(error);
+        }
+      });
+
+      uploadPromises.push(uploadPromise);
+    }
+
+    try {
+      const uploadedUrls = await Promise.all(uploadPromises);
+      onChange([...value, ...uploadedUrls]);
+      setStatus("success");
+    } catch (error) {
+      console.error("Upload error:", error);
+      setError(error instanceof Error ? error.message : "Failed to upload images");
+      setStatus("error");
+    }
+  };
+
+  return (
+    <div className="w-full">
+      <div className="flex flex-col">
+        <div className="flex flex-col items-center justify-center border-2 border-dashed border-blue-300 rounded-lg p-6 text-center">
+          <Upload className="h-10 w-10 text-blue-500 mb-2" />
+          <p className="text-sm font-medium text-blue-700">
+            {status === "uploading" ? "Uploading..." : "Upload additional images"}
+          </p>
+          <p className="text-xs text-gray-500 mt-1">
+            {`${value.length}/5 images uploaded`}
+          </p>
+          
+          <input
+            id="additional-images-upload"
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={handleUpload}
+            className="hidden"
+            disabled={status === "uploading" || value.length >= 5}
+          />
+          
+          <label htmlFor="additional-images-upload" className="mt-4">
+            <div className={`cursor-pointer inline-flex items-center px-4 py-2 rounded-md text-sm font-medium transition-colors
+              ${value.length >= 5 
+                ? "bg-gray-300 text-gray-700 cursor-not-allowed" 
+                : status === "uploading" 
+                  ? "bg-blue-100 text-blue-700" 
+                  : "bg-blue-600 text-white hover:bg-blue-700"}`}
+            >
+              {status === "uploading" ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Uploading...
+                </>
+              ) : value.length >= 5 ? (
+                "Maximum images reached"
+              ) : (
+                "Select Images"
+              )}
             </div>
-          ))}
+          </label>
+          
+          {error && (
+            <p className="mt-2 text-sm text-red-600">{error}</p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Payment QR Upload Component
+interface PaymentQRUploadProps {
+  value: string;
+  onChange: (url: string) => void;
+  onRemove: () => void;
+}
+
+export const PaymentQRUpload = ({ value, onChange, onRemove }: PaymentQRUploadProps) => {
+  const [status, setStatus] = useState<UploadStatus>("idle");
+  const [error, setError] = useState<string | null>(null);
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      setError("Please upload an image file");
+      return;
+    }
+
+    // Validate file size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      setError("QR code image size must be less than 2MB");
+      return;
+    }
+
+    setStatus("uploading");
+    setError(null);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("type", "qr");
+
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data: UploadResponse = await response.json();
+
+      if (!data.success || !data.url) {
+        throw new Error(data.error || "Failed to upload QR code");
+      }
+
+      onChange(data.url);
+      setStatus("success");
+    } catch (error) {
+      console.error("Upload error:", error);
+      setError(error instanceof Error ? error.message : "Failed to upload QR code");
+      setStatus("error");
+    }
+  };
+
+  return (
+    <div className="w-full">
+      {value ? (
+        <div className="relative">
+          <div className="w-48 h-48 mx-auto relative rounded-lg overflow-hidden border border-blue-200">
+            <Image 
+              src={value} 
+              alt="Payment QR code" 
+              fill 
+              className="object-contain" 
+            />
+          </div>
+          <button
+            type="button"
+            onClick={onRemove}
+            className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 w-8 h-8 flex items-center justify-center"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+      ) : (
+        <div className="w-full">
+          <div className="flex flex-col items-center justify-center border-2 border-dashed border-blue-300 rounded-lg p-6 text-center">
+            <Upload className="h-10 w-10 text-blue-500 mb-2" />
+            <p className="text-sm font-medium text-blue-700">
+              {status === "uploading" ? "Uploading..." : "Upload payment QR code"}
+            </p>
+            <p className="text-xs text-gray-500 mt-1">PNG, JPG, WEBP up to 2MB</p>
+            
+            <input
+              id="qr-code-upload"
+              type="file"
+              accept="image/*"
+              onChange={handleUpload}
+              className="hidden"
+              disabled={status === "uploading"}
+            />
+            
+            <label htmlFor="qr-code-upload" className="mt-4">
+              <div className={`cursor-pointer inline-flex items-center px-4 py-2 rounded-md text-sm font-medium transition-colors
+                ${status === "uploading" 
+                  ? "bg-blue-100 text-blue-700" 
+                  : "bg-blue-600 text-white hover:bg-blue-700"}`}
+              >
+                {status === "uploading" ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Uploading...
+                  </>
+                ) : (
+                  "Select QR Code"
+                )}
+              </div>
+            </label>
+            
+            {error && (
+              <p className="mt-2 text-sm text-red-600">{error}</p>
+            )}
+          </div>
         </div>
       )}
     </div>
