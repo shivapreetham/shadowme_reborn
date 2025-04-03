@@ -31,7 +31,6 @@ export async function GET(request: Request) {
         email: true,
         batch: true,
         branch: true,
-        avatar: true,
         course: true,
         lastSeen: true,
         overallPercentage: true,
