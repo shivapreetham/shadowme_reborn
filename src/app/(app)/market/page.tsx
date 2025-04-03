@@ -23,6 +23,8 @@ import {
   PopoverTrigger 
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { Suspense } from "react";
+
 
 export default function MarketPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -89,6 +91,7 @@ export default function MarketPage() {
   const hasActiveFilters = Boolean(category || minPrice || maxPrice);
 
   return (
+    <Suspense fallback={<div> loading...</div>}>
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
       <div className="container py-8">
         {/* Header with glass effect */}
@@ -283,5 +286,6 @@ export default function MarketPage() {
         )}
       </div>
     </div>
+    </Suspense>
   );
 }
