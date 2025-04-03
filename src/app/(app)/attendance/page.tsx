@@ -318,56 +318,58 @@ export default function AttendanceDashboard() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-4">
         <header className="mb-8">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-gray-800 dark:text-white">Attendance Dashboard</h1>
-              <p className="text-gray-600 dark:text-gray-400 mt-2">
-                {attendanceData.user.name} • {attendanceData.user.branch || 'No Department'} • {attendanceData.user.batch ? `Semester ${attendanceData.user.batch}` : 'No Semester'} 
-              </p>
-            </div>
-            
-            <div className="flex items-center space-x-4">
-              <div className="flex bg-gray-200 dark:bg-gray-700 rounded-lg p-1">
-                <button 
-                  onClick={() => setViewMode("overview")}
-                  className={`px-3 py-1.5 rounded-md text-sm font-medium transition ${
-                    viewMode === "overview" 
-                      ? "bg-white dark:bg-gray-800 text-gray-800 dark:text-white shadow" 
-                      : "text-gray-600 dark:text-gray-300"
-                  }`}
-                >
-                  Overview
-                </button>
-                <button 
-                  onClick={() => setViewMode("detailed")}
-                  className={`px-3 py-1.5 rounded-md text-sm font-medium transition ${
-                    viewMode === "detailed" 
-                      ? "bg-white dark:bg-gray-800 text-gray-800 dark:text-white shadow" 
-                      : "text-gray-600 dark:text-gray-300"
-                  }`}
-                >
-                  Detailed
-                </button>
-                <button 
-                  onClick={() => setViewMode("trends")}
-                  className={`px-3 py-1.5 rounded-md text-sm font-medium transition ${
-                    viewMode === "trends" 
-                      ? "bg-white dark:bg-gray-800 text-gray-800 dark:text-white shadow" 
-                      : "text-gray-600 dark:text-gray-300"
-                  }`}
-                >
-                  Trends
-                </button>
-              </div>
-              <button 
-                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
-                aria-label="Toggle theme"
-              >
-                {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-              </button>
-            </div>
-          </div>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
+  {/* Attendance Dashboard Info */}
+  <div>
+    <h1 className="text-3xl md:text-4xl font-bold text-gray-800 dark:text-white">
+      Attendance Dashboard
+    </h1>
+    <p className="text-gray-600 dark:text-gray-400 mt-2">
+      {attendanceData.user.name} • {attendanceData.user.branch || 'No Department'} • {attendanceData.user.batch ? `Semester ${attendanceData.user.batch}` : 'No Semester'}
+    </p>
+  </div>
+
+  {/* Button Group */}
+  <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-4">
+    {/* View Mode Buttons */}
+    <div className="flex bg-gray-200 dark:bg-gray-700 rounded-lg p-1">
+      <button 
+        onClick={() => setViewMode("overview")}
+        className={`px-3 py-1.5 rounded-md text-sm font-medium transition ${
+          viewMode === "overview"
+            ? "bg-white dark:bg-gray-800 text-gray-800 dark:text-white shadow"
+            : "text-gray-600 dark:text-gray-300"
+        }`}
+      >
+        Overview
+      </button>
+      <button 
+        onClick={() => setViewMode("detailed")}
+        className={`px-3 py-1.5 rounded-md text-sm font-medium transition ${
+          viewMode === "detailed"
+            ? "bg-white dark:bg-gray-800 text-gray-800 dark:text-white shadow"
+            : "text-gray-600 dark:text-gray-300"
+        }`}
+      >
+        Detailed
+      </button>
+      <button 
+        onClick={() => setViewMode("trends")}
+        className={`px-3 py-1.5 rounded-md text-sm font-medium transition ${
+          viewMode === "trends"
+            ? "bg-white dark:bg-gray-800 text-gray-800 dark:text-white shadow"
+            : "text-gray-600 dark:text-gray-300"
+        }`}
+      >
+        Trends
+      </button>
+    </div>
+
+    {/* Theme Toggle Button */}
+    
+  </div>
+</div>
+
 
           {/* Last updated banner */}
           <div className="mt-4 flex justify-between items-center bg-blue-50 dark:bg-blue-900/20 rounded-lg px-4 py-2">
