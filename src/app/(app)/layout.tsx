@@ -5,7 +5,7 @@ interface RootLayoutProps {
   children: React.ReactNode;
 }
 export const metadata: Metadata = {
-  title: 'Dashboard | shatterbox - Your Ultimate Chat Experience',
+  title: 'NIT JSR Hub | shadowme - Your goto website for NIT JSR',
 };
 
 export default async function RootLayout({ children }: RootLayoutProps) {

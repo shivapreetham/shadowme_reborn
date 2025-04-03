@@ -1,43 +1,119 @@
-'use client';
-import { ReactNode } from 'react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import Image from 'next/image';
+"use client";
 
-interface MeetingModalProps {
+import React from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import clsx from "clsx";
+
+export interface MeetingModalProps {
   isOpen: boolean;
   onClose: () => void;
   title: string;
-  className?: string;
-  children?: ReactNode;
-  handleClick?: () => void;
+  children: React.ReactNode;
+  handleClick: () => void;
   buttonText?: string;
-  instantMeeting?: boolean;
-  image?: string;
+  buttonIcon?: React.ReactNode;
   buttonClassName?: string;
-  buttonIcon?: string;
+  className?: string;
+  icon?: React.ReactNode;
 }
 
-const MeetingModal = ({ isOpen, onClose, title, className, children, handleClick, buttonText, image, buttonIcon }: MeetingModalProps) => {
+const MeetingModal: React.FC<MeetingModalProps> = ({
+  isOpen,
+  onClose,
+  title,
+  children,
+  handleClick,
+  buttonText = "Confirm",
+  buttonIcon,
+  buttonClassName = "",
+  className = "",
+  icon,
+}) => {
+  const modalVariants = {
+    hidden: { opacity: 0, scale: 0.9 },
+    visible: { 
+      opacity: 1, 
+      scale: 1,
+      transition: { 
+        type: "spring", 
+        stiffness: 300, 
+        damping: 30 
+      } 
+    },
+    exit: { 
+      opacity: 0, 
+      scale: 0.9,
+      transition: { 
+        duration: 0.2 
+      } 
+    }
+  };
+  
+  const backdropVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 },
+    exit: { opacity: 0 }
+  };
+
+  if (!isOpen) return null;
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="flex w-full max-w-[520px] flex-col gap-6 border-none bg-dark-1 px-6 py-9 text-white">
-        <div className="flex flex-col gap-6">
-          {image && (
-            <div className="flex justify-center">
-              <Image src={image} alt="checked" width={72} height={72} />
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm p-4"
+          initial="hidden"
+          animate="visible"
+          exit="exit"
+          variants={backdropVariants}
+          onClick={onClose}
+        >
+          <motion.div
+            className={clsx("rounded-2xl p-6 shadow-2xl", className)}
+            variants={modalVariants}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center mb-5">
+              <h2 className="text-xl font-semibold text-gray-800">{title}</h2>
+              <motion.button 
+                onClick={onClose}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                className="h-8 w-8 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
+              >
+                <i className="fa-solid fa-times"></i>
+              </motion.button>
             </div>
-          )}
-          <h1 className={cn('text-3xl font-bold leading-[42px]', className)}>{title}</h1>
-          {children}
-          <Button className={'bg-blue-1 focus-visible:ring-0 focus-visible:ring-offset-0'} onClick={handleClick}>
-            {buttonIcon && <Image src={buttonIcon} alt="button icon" width={13} height={13} />} &nbsp;
-            {buttonText || 'Schedule Meeting'}
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
+            
+            {icon && (
+              <motion.div 
+                className="mb-4 flex justify-center"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              >
+                {icon}
+              </motion.div>
+            )}
+            
+            <div>{children}</div>
+            
+            <motion.button
+              onClick={handleClick}
+              className={clsx(
+                "mt-6 w-full py-3 rounded-xl font-medium flex items-center justify-center shadow-md",
+                buttonClassName || "bg-blue-500 text-white"
+              )}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              {buttonIcon && <span className="mr-2">{buttonIcon}</span>}
+              {buttonText}
+            </motion.button>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 

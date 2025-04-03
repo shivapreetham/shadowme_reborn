@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { StreamCall, StreamTheme } from '@stream-io/video-react-sdk';
 import { useParams } from 'next/navigation';
 import { Loader } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 import { useGetCallById } from '@/app/hooks/useGetCallById';
 import Alert from '@/components/videoChat/Alert';
@@ -21,19 +22,75 @@ const MeetingPage = () => {
   const { currentUser } = useCurrentUserContext();
   const isUserLoading = !currentUser;
 
-  if (!meetingId || isUserLoading || isCallLoading) return <Loader />;
+  // Bubble animation elements
+  const bubbleVariants = {
+    initial: { scale: 0, opacity: 0 },
+    animate: { scale: 1, opacity: 0.1 },
+    exit: { scale: 0, opacity: 0 }
+  };
 
-  if (!call) return <p className="text-center text-3xl font-bold text-white">Call Not Found</p>;
+  if (!meetingId || isUserLoading || isCallLoading) return (
+    <div className="h-screen w-full flex items-center justify-center bg-gradient-to-br from-white to-blue-50">
+      <motion.div 
+        initial={{ rotate: 0 }}
+        animate={{ rotate: 360 }}
+        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+      >
+        <Loader className="h-12 w-12 text-blue-500" />
+      </motion.div>
+    </div>
+  );
+
+  if (!call) return (
+    <div className="h-screen w-full flex items-center justify-center bg-gradient-to-br from-white to-blue-50">
+      <p className="text-center text-3xl font-bold text-black backdrop-blur-md bg-white/30 p-6 rounded-2xl shadow-lg">
+        Call Not Found
+      </p>
+    </div>
+  );
 
   const notAllowed = call.type === 'invited' && (!currentUser || !call.state.members.find(m => m.user.id === currentUser.id));
 
   if (notAllowed) return <Alert title="You are not allowed to join this meeting" />;
 
   return (
-    <main className="h-screen w-full">
-      <StreamCall call={call}>
-        <StreamTheme>{!isSetupComplete ? <MeetingSetup setIsSetupComplete={setIsSetupComplete} /> : <MeetingRoom />}</StreamTheme>
-      </StreamCall>
+    <main className="h-screen w-full bg-gradient-to-br from-white to-blue-50 relative overflow-hidden">
+      {/* Animated background bubbles */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {[...Array(5)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute rounded-full bg-blue-400"
+            style={{
+              width: Math.random() * 300 + 50,
+              height: Math.random() * 300 + 50,
+              top: `${Math.random() * 100}%`,
+              left: `${Math.random() * 100}%`
+            }}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            variants={bubbleVariants}
+            transition={{
+              duration: Math.random() * 4 + 3,
+              repeat: Infinity,
+              repeatType: "reverse"
+            }}
+          />
+        ))}
+      </div>
+      
+      {/* Glass container for content */}
+      <div className="relative h-full w-full">
+        <StreamCall call={call}>
+          <StreamTheme>
+            {!isSetupComplete ? 
+              <MeetingSetup setIsSetupComplete={setIsSetupComplete} /> : 
+              <MeetingRoom />
+            }
+          </StreamTheme>
+        </StreamCall>
+      </div>
     </main>
   );
 };
