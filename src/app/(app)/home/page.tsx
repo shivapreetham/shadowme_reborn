@@ -66,10 +66,10 @@ export default function Home() {
             <Video className="text-white mb-4 h-10 w-10" />
             <h2 className="text-xl font-bold text-white mb-2">Anonymous Video</h2>
             <p className="text-gray-200 mb-4">
-              Voice and video with identity hidden, exciting filters included
+              Voice and videoChat with identity hidden, exciting filters included
             </p>
             <Link
-              href="/video"
+              href="/videoChat"
               className="inline-flex items-center text-white font-medium hover:text-gray-200"
             >
               Start a call <ArrowRight className="ml-2 h-4 w-4" />
@@ -131,7 +131,7 @@ export default function Home() {
               </div>
               <div className="flex justify-end">
                 <Link
-                  href="/olx"
+                  href="/market"
                   className="inline-flex items-center text-blue-600 font-medium hover:text-blue-800"
                 >
                   Browse marketplace <ArrowRight className="ml-2 h-4 w-4" />
@@ -167,7 +167,7 @@ export default function Home() {
                     <span className="text-blue-700 font-medium text-lg">Smart Chat</span>
                   </Link>
                   
-                  <Link href="/video" className="bg-white rounded-xl p-4 flex flex-col items-center shadow-lg" onClick={() => setMobileMenuOpen(false)}>
+                  <Link href="/videoChat" className="bg-white rounded-xl p-4 flex flex-col items-center shadow-lg" onClick={() => setMobileMenuOpen(false)}>
                     <Video className="text-blue-700 mb-2 h-10 w-10" />
                     <span className="text-blue-700 font-medium text-lg">Anonymous Video</span>
                   </Link>
@@ -262,7 +262,7 @@ export default function Home() {
                       <MessageSquare className="text-blue-600 mb-2 h-8 w-8" />
                       <span className="text-slate-800 font-medium text-sm">Smart Chat</span>
                     </Link>
-                    <Link href="/video" className="bg-gray-600 rounded-xl p-3 shadow-sm flex flex-col items-center">
+                    <Link href="/videoChat" className="bg-gray-600 rounded-xl p-3 shadow-sm flex flex-col items-center">
                       <Video className="text-white mb-2 h-8 w-8" />
                       <span className="text-white font-medium text-sm">Anonymous Video</span>
                     </Link>
@@ -298,7 +298,7 @@ export default function Home() {
                           </div>
                           <div className="flex-1">
                             <h4 className="font-bold text-slate-800">Anonymous Video</h4>
-                            <p className="text-sm text-slate-600">Identity-hidden video calls</p>
+                            <p className="text-sm text-slate-600">Identity-hidden videoChat calls</p>
                           </div>
                           <ArrowRight className="text-blue-600 h-4 w-4" />
                         </div>
@@ -377,3 +377,4 @@ export default function Home() {
     </div>
   );
 }
+
