@@ -5,7 +5,7 @@ import Navbar from '@/components/videoChat/Navbar';
 import Sidebar from '@/components/videoChat/Sidebar';
 
 export const metadata: Metadata = {
-  title: 'videoChat | shatterbox - Your Ultimate Chat Experience',
+  title: 'videoChat | shadowme - Your Ultimate Chat Experience',
   description: 'A workspace for your team, powered by Stream Chat .',
 };
 
