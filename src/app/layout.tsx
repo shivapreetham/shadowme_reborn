@@ -6,8 +6,8 @@ import "./globals.css";
 import { ThemeProvider } from "@/context/ThemeProvider";
 import ActiveStatus from "@/components/chat/ActiveStatus";
 export const metadata: Metadata = {
-  title: "shatterbox",
-  description: "so whom do you trust?!!",
+  title: "NIT JSR Hub | shadowme",
+  description: "Your goto website for NIT JSR",
   icons: {
     icon: "/image.jpg",
   },
@@ -32,7 +32,7 @@ export default function RootLayout({
           {/* <PusherProvider> */}
             <ThemeProvider
               attribute="class"
-              defaultTheme="system"
+              defaultTheme="light"
               enableSystem
               disableTransitionOnChange
             >
