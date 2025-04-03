@@ -5,7 +5,7 @@ import useRoutes from '@/app/hooks/useRoutes';
 import MobileFooterItem from './MobileFooterItem';
 import { ModeToggle } from '@/components/home&anonymous/ModeToggle';
 
-const MobileFooter = () => {
+const MobileFooter = ({currentUser}) => {
   const { routes } = useRoutes();
   const { isOpen } = useConversation();
 
@@ -32,6 +32,16 @@ const MobileFooter = () => {
       <div className="p-3">
         <ModeToggle />
       </div>
+
+      <div
+        onClick={() => setIsOpen(true)}
+                    className="cursor-pointer hover:bg-secondary/70 transition rounded-xl p-3 mx-2 mb-4 flex justify-center glass-card"
+                    title="Edit profile"
+                  >
+                    <div className="relative">
+                      <Avatar user={currentUser} />
+                      {/* <span className="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-green-400 ring-2 ring-background"></span> */}
+                    </div>
     </div>
   );
 };
