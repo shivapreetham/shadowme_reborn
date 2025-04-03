@@ -291,7 +291,7 @@ export default function Home() {
                       </Link>
 
                       {/* Anonymous Video */}
-                      <Link href="/video" className="block">
+                      <Link href="/videoChat" className="block">
                         <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm flex items-center">
                           <div className="bg-gray-600 rounded-full p-2 mr-4">
                             <Video className="text-white h-6 w-6" />
