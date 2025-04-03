@@ -251,7 +251,7 @@ export default function MarketPage() {
                     <Search className="h-8 w-8 text-blue-400" />
                   </div>
                   <h3 className="text-xl font-medium text-blue-900">No products found</h3>
-                  <p className="text-blue-600 max-w-md">We couldn't find any products matching your current filters.</p>
+                  <p className="text-blue-600 max-w-md">We couldnt find any products matching your current filters.</p>
                   <div className="flex gap-3 mt-2">
                     {hasActiveFilters && (
                       <Button 

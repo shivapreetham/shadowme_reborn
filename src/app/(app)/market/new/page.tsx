@@ -366,7 +366,7 @@ export default function NewProductPage() {
                           <FormControl>
                             <div className="bg-white/70 backdrop-blur-sm p-5 rounded-xl border border-dashed border-blue-200 transition-all hover:border-blue-400 duration-300">
                               <PaymentQRUpload
-                                value={field.value}
+                                value={field.value ?? ""}
                                 onChange={(url: string) => field.onChange(url)}
                                 onRemove={() => field.onChange("")}
                               />
