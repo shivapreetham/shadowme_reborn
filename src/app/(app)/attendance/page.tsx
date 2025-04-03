@@ -2,7 +2,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useTheme } from "next-themes";
 import { 
-  Sun, Moon, BookOpen, UserCheck, Calendar, Clock, AlertCircle, 
+   BookOpen, UserCheck, Calendar, Clock, AlertCircle, 
   CheckCircle, XCircle, ChevronDown, BarChart3, ArrowUpRight, 
   Award, CalendarClock, TrendingUp, BookOpenCheck, BookX, Flame
 } from "lucide-react";
@@ -114,7 +114,7 @@ interface AttendanceData {
 }
 
 export default function AttendanceDashboard() {
-  const { theme, setTheme } = useTheme();
+  const { theme } = useTheme();
   const [attendanceData, setAttendanceData] = useState<AttendanceData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState("");
