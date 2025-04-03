@@ -2,9 +2,8 @@
 "use client";
 
 import { useState } from "react";
-import { Upload, X, Loader2, Check } from "lucide-react";
+import { Upload, X, Loader2} from "lucide-react";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
 
 // Common types
 type UploadStatus = "idle" | "uploading" | "success" | "error";
@@ -142,7 +141,7 @@ interface AdditionalImagesUploadProps {
   onRemove: (url: string) => void;
 }
 
-export const AdditionalImagesUpload = ({ value, onChange, onRemove }: AdditionalImagesUploadProps) => {
+export const AdditionalImagesUpload = ({ value, onChange}: AdditionalImagesUploadProps) => {
   const [status, setStatus] = useState<UploadStatus>("idle");
   const [error, setError] = useState<string | null>(null);
 

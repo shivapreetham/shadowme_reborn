@@ -5,7 +5,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 export async function POST(
   req: Request,
-  { params }: { params: { productId: string } }
+  { params }: { params: any}
 ) {
   try {
     const session = await getServerSession(authOptions);

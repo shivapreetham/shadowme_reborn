@@ -6,7 +6,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 
 export async function GET(
   req: Request,
-  { params }: { params: { productId: string } }
+  { params }: { params: any } 
 ) {
   try {
     if (!params.productId) {
@@ -49,7 +49,7 @@ export async function GET(
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { productId: string } }
+  { params }: { params: any }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -92,7 +92,7 @@ export async function PATCH(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { productId: string } }
+  { params }: { params: any }
 ) {
   try {
     const session = await getServerSession(authOptions);
