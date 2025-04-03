@@ -2,10 +2,31 @@ import prisma from '@/lib/prismadb';
 import bcrypt from 'bcryptjs';
 import { sendVerificationEmail } from '@/helpers/sendVerificationEmails';
 
+// Email pattern to extract information
+const EMAIL_PATTERN = /^(\d{4})(ug|pg)([a-z]+)\d+@nitjsr\.ac\.in$/i;
+
+// Maps for branch and course information
+const branchMap = {
+  ug: 'Undergraduate',
+  pg: 'Postgraduate',
+};
+
+const courseMap = {
+  cs: 'Computer Science and Engineering',
+  ec: 'Electronics and Communication Engineering',
+  ee: 'Electrical Engineering',
+  ce: 'Civil Engineering',
+  me: 'Mechanical Engineering',
+  mm: 'Metallurgical and Materials Engineering',
+  pi: 'Production and Industrial Engineering',
+  csca: 'Master in Computer Applications',
+  phd: 'PhD',
+};
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    // console.log(body)
+    
     if (!body) {
       return Response.json(
         { success: false, message: 'No request body provided' },
@@ -22,6 +43,22 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
+    
+    // Parse email to extract batch, branch, and course
+    const emailMatch = email.match(EMAIL_PATTERN);
+    
+    let batch = null;
+    let branch = null;
+    let course = null;
+    
+    if (emailMatch) {
+      const [, batchValue, branchCode, courseCode] = emailMatch;
+      
+      batch = batchValue;
+      branch = branchMap[branchCode.toLowerCase() as keyof typeof branchMap] || branchCode.toUpperCase();
+      course = courseMap[courseCode.toLowerCase() as keyof typeof courseMap] || courseCode.toUpperCase();
+    }
+
     // Check if user exists with verified username
     const existingVerifiedUserByUsername = await prisma.user.findFirst({
       where: {
@@ -36,11 +73,12 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
+    
     // Check if user exists with the same email
     const existingUserByEmail = await prisma.user.findFirst({
       where: { email },
     });
-    // console.log(existingUserByEmail)
+    
     const verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
 
     if (existingUserByEmail) {
@@ -64,18 +102,18 @@ export async function POST(request: Request) {
             verifyCode,
             verifyCodeExpiry: new Date(Date.now() + 3600000),
             isVerified: false,
-            isAcceptingAnonymousMessages: true
+            isAcceptingAnonymousMessages: true,
+            batch,
+            branch,
+            course
           },
         });
       }
     } else {
-
       // Create new user if email doesn't exist
       const hashedPassword = await bcrypt.hash(password, 10);
       const expiryDate = new Date();
       expiryDate.setHours(expiryDate.getHours() + 1); // 1 hour expiry
-
-    console.log("came until here")
 
       await prisma.user.create({
         data: {
@@ -87,11 +125,13 @@ export async function POST(request: Request) {
           verifyCode,
           verifyCodeExpiry: expiryDate,
           isVerified: false,
-          isAcceptingAnonymousMessages: true
+          isAcceptingAnonymousMessages: true,
+          batch,
+          branch,
+          course
         },
       });
     }
-    console.log("came until here")
 
     // Send verification email
     const emailResponse = await sendVerificationEmail(
@@ -130,5 +170,5 @@ export async function POST(request: Request) {
         headers: { 'Content-Type': 'application/json' }
       }
     );
-}
+  }
 }

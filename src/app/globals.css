@@ -2,36 +2,57 @@
 @tailwind components;
 @tailwind utilities;
 
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
 @layer base {
   :root {
-    /* Light theme with blue accents */
-    --background: 0 0% 100%;  /* White */
-    --foreground: 222 47% 11%;  /* Dark blue-gray for text */
-    
-    /* Primary blue */
-    --primary: 221 83% 53%;  /* Vibrant blue */
-    --primary-foreground: 0 0% 98%;
-    
-    /* Secondary light blue */
-    --secondary: 214 32% 91%;  /* Light blue */
-    --secondary-foreground: 222 47% 11%;
-    
-    /* Blue-tinted muted colors */
-    --muted: 214 32% 91%;
-    --muted-foreground: 215 25% 27%;
-    
-    /* Blue accent */
-    --accent: 217 91% 60%;  /* Medium blue */
-    --accent-foreground: 0 0% 98%;
-    
-    /* Keep other variables similar but adjust border/ring */
+    /* Light theme remains unchanged */
+    --background: 220 25% 97%;
+    --foreground: 220 45% 15%;
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 220 45% 15%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 221 83% 53%;
+    --popover-foreground: 220 45% 15%;
+    --primary: 220 85% 45%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 25% 95%;
+    --secondary-foreground: 220 45% 15%;
+    --muted: 220 25% 95%;
+    --muted-foreground: 220 25% 45%;
+    --accent: 220 25% 95%;
+    --accent-foreground: 220 45% 15%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 25% 90%;
+    --input: 220 25% 90%;
+    --ring: 220 85% 45%;
+    --radius: 0.6rem;
+  }
+
+  .dark {
+    /* Dark theme - enhanced with violet/purple tones */
+    --background: 240 30% 4%;  /* Deep black with slight purple tint */
+    --foreground: 250 15% 95%;
+    --card: 240 30% 6%;
+    --card-foreground: 250 15% 95%;
+    --popover: 240 30% 6%;
+    --popover-foreground: 250 15% 95%;
+    --primary: 265 85% 65%;  /* Vibrant purple */
+    --primary-foreground: 240 30% 4%;
+    --secondary: 250 30% 10%;
+    --secondary-foreground: 250 15% 95%;
+    --muted: 250 30% 10%;
+    --muted-foreground: 250 15% 65%;
+    --accent: 280 50% 25%;  /* Deep purple accent */
+    --accent-foreground: 250 15% 95%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 250 15% 95%;
+    --border: 250 30% 12%;
+    --input: 250 30% 10%;
+    --ring: 265 85% 65%;
+    --radius: 0.6rem;
   }
 }
 
@@ -47,48 +68,16 @@
 }
 
 @layer utilities {
-  /* Glass effect for cards with rounded corners */
+  
+  /* Glass effect for cards */
   .glass-card {
-    @apply bg-background/50 backdrop-blur-sm rounded-xl shadow-md transition-all duration-200;
+    @apply bg-background/50 backdrop-blur-sm;
     border: 1px solid rgb(var(--primary) / 0.1);
   }
 
   .glass-card:hover {
-    @apply shadow-lg;
     border-color: rgb(var(--primary) / 0.2);
-    transform: translateY(-2px);
   }
-  
-  /* Soft rounded corners for buttons and inputs */
-  .btn, button, input, select, textarea {
-    @apply rounded-md;
-  }
-  
-  /* Add subtle hover effects */
-  .hover-lift {
-    @apply transition-transform duration-200;
-  }
-  
-  .hover-lift:hover {
-    transform: translateY(-2px);
-  }
-}
 
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
   
-  /* Soften all corners by default */
-  div, section, aside, main, nav, header, footer {
-    @apply rounded-lg;
-  }
-  
-  /* Add subtle animations for better UX */
-  button, a, input, select {
-    @apply transition-all duration-200;
-  }
 }
