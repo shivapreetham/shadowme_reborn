@@ -241,7 +241,7 @@ export default function Home() {
             </div>
             <div className="flex justify-end">
               <Link
-                href="/olx"
+                href="/market"
                 className="inline-flex items-center text-blue-600 font-medium hover:text-blue-800"
               >
                 Browse marketplace <ArrowRight className="ml-2 h-4 w-4" />
