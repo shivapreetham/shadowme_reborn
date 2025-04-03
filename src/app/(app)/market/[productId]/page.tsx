@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Loader2, Heart, Phone, MapPin, ArrowLeft, Edit, Check } from "lucide-react";
+import { Loader2, Heart, Phone, MapPin, ArrowLeft, Edit, Check, ShoppingBag, Calendar } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
@@ -105,19 +105,27 @@ export default function ProductDetailPage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-[60vh]">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="p-8 rounded-2xl bg-white/5 backdrop-blur-lg border border-white/10 shadow-xl">
+          <Loader2 className="h-12 w-12 animate-spin text-primary" />
+        </div>
       </div>
     );
   }
 
   if (!product) {
     return (
-      <div className="text-center py-12">
-        <p>Product not found</p>
-        <Link href="/market">
-          <Button variant="link">Back to Marketplace</Button>
-        </Link>
+      <div className="flex flex-col items-center justify-center min-h-screen gap-4">
+        <div className="p-8 rounded-2xl bg-white/5 backdrop-blur-lg border border-white/10 shadow-xl text-center">
+          <ShoppingBag className="h-16 w-16 mx-auto mb-4 text-muted-foreground opacity-50" />
+          <h2 className="text-2xl font-bold mb-2">Product Not Found</h2>
+          <p className="text-muted-foreground mb-6">This product may have been removed or is no longer available.</p>
+          <Link href="/market">
+            <Button variant="default" size="lg" className="rounded-full px-8">
+              Back to Marketplace
+            </Button>
+          </Link>
+        </div>
       </div>
     );
   }
@@ -125,201 +133,231 @@ export default function ProductDetailPage() {
   const isOwner = session?.user?.id === product.sellerId;
   const allImages = [product.mainImage, ...product.images];
 
+  const getStatusVariant = (status: ProductStatus) => {
+    switch (status) {
+      case "AVAILABLE": return "bg-green-500/20 text-green-500";
+      case "RESERVED": return "bg-amber-500/20 text-amber-500";
+      case "SOLD": return "bg-red-500/20 text-red-500";
+      default: return "bg-slate-500/20 text-slate-500";
+    }
+  };
+
   return (
-    <div className="container py-6">
-      <div className="mb-6">
-        <Button variant="ghost" onClick={() => router.back()}>
+    <div className="min-h-screen py-12 px-4 sm:px-6 bg-gradient-to-b from-background to-background/50">
+      <div className="max-w-6xl mx-auto">
+        <Button 
+          variant="ghost" 
+          onClick={() => router.back()} 
+          className="mb-8 rounded-full hover:bg-white/10 transition-all duration-300"
+        >
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back
         </Button>
-      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <Carousel className="mb-4">
-            <CarouselContent>
-              {allImages.map((image, index) => (
-                <CarouselItem key={index}>
-                  <div className="relative aspect-square w-full overflow-hidden rounded-md">
+        <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-3xl shadow-xl overflow-hidden">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-0">
+            {/* Left column - Images */}
+            <div className="lg:col-span-3 p-6">
+              <Carousel className="mb-6 rounded-2xl overflow-hidden shadow-lg">
+                <CarouselContent>
+                  {allImages.map((image, index) => (
+                    <CarouselItem key={index}>
+                      <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl">
+                        <Image
+                          src={image}
+                          alt={`${product.title} - Image ${index + 1}`}
+                          fill
+                          className="object-cover hover:scale-105 transition-transform duration-700"
+                        />
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious className="left-2 bg-black/30 hover:bg-black/50 backdrop-blur-sm border-none text-white" />
+                <CarouselNext className="right-2 bg-black/30 hover:bg-black/50 backdrop-blur-sm border-none text-white" />
+              </Carousel>
+
+              {/* Status Badge */}
+              <div className="flex flex-wrap items-center gap-3 mb-6">
+                <span className={`px-4 py-1.5 rounded-full text-sm font-medium ${getStatusVariant(product.status)}`}>
+                  {product.status === "AVAILABLE" 
+                    ? "Available" 
+                    : product.status === "RESERVED" 
+                      ? "Reserved" 
+                      : "Sold"}
+                </span>
+                <Badge variant="outline" className="rounded-full px-3 py-1 bg-white/5 border-white/10">
+                  {product.category}
+                </Badge>
+                {product.condition && (
+                  <Badge variant="outline" className="rounded-full px-3 py-1 bg-white/5 border-white/10">
+                    {product.condition}
+                  </Badge>
+                )}
+              </div>
+
+              {/* Seller controls */}
+              {isOwner && (
+                <div className="flex flex-wrap gap-2 mb-6 p-4 bg-white/5 rounded-2xl">
+                  <h3 className="w-full text-sm font-medium mb-3 text-muted-foreground">Product Controls</h3>
+                  
+                  <Link href={`/market/${productId}/edit`}>
+                    <Button variant="outline" size="sm" className="rounded-full bg-white/5 border-white/10 hover:bg-white/10">
+                      <Edit className="mr-2 h-4 w-4" />
+                      Edit
+                    </Button>
+                  </Link>
+                  
+                  {product.status !== "AVAILABLE" && (
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => updateStatus("AVAILABLE")}
+                      disabled={statusLoading}
+                      className="rounded-full bg-white/5 border-white/10 hover:bg-white/10"
+                    >
+                      {statusLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
+                      Mark as Available
+                    </Button>
+                  )}
+                  
+                  {product.status !== "RESERVED" && (
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => updateStatus("RESERVED")}
+                      disabled={statusLoading}
+                      className="rounded-full bg-white/5 border-white/10 hover:bg-white/10"
+                    >
+                      {statusLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
+                      Mark as Reserved
+                    </Button>
+                  )}
+                  
+                  {product.status !== "SOLD" && (
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => updateStatus("SOLD")}
+                      disabled={statusLoading}
+                      className="rounded-full bg-white/5 border-white/10 hover:bg-white/10"
+                    >
+                      {statusLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
+                      Mark as Sold
+                    </Button>
+                  )}
+                </div>
+              )}
+              
+              {/* Show interested users to owner */}
+              {isOwner && product.interestedUsers && product.interestedUsers.length > 0 && (
+                <div className="p-4 bg-white/5 rounded-2xl">
+                  <h3 className="font-medium mb-3 text-sm">Interested Users ({product.interestedUsers.length})</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {product.interestedUsers.map((user: User) => (
+                      <Badge key={user.id} variant="secondary" className="rounded-full px-3 py-1 bg-primary/10 text-primary">
+                        {user.username}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Right column - Details */}
+            <div className="lg:col-span-2 p-6 border-t lg:border-t-0 lg:border-l border-white/10 bg-white/2">
+              <h1 className="text-3xl font-bold mb-2">{product.title}</h1>
+              <p className="text-3xl font-bold text-primary mb-6">₹{product.price.toLocaleString()}</p>
+              
+              <div className="mb-8">
+                <h3 className="text-sm font-medium mb-3 text-muted-foreground">DESCRIPTION</h3>
+                <p className="whitespace-pre-line text-base">{product.description}</p>
+              </div>
+              
+              <Card className="mb-8 rounded-2xl border-white/10 bg-white/5 backdrop-blur-md shadow-lg overflow-hidden">
+                <CardContent className="p-5">
+                  <h3 className="text-sm font-medium mb-4 text-muted-foreground">SELLER INFORMATION</h3>
+                  <div className="flex items-center gap-4 mb-4">
+                    <Avatar className="h-14 w-14 rounded-2xl border-2 border-primary/20">
+                      <AvatarImage src={product.seller?.image || ""} className="object-cover" />
+                      <AvatarFallback className="bg-primary/10 text-primary text-lg">
+                        {product.seller?.username.substring(0, 2).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="font-medium text-lg">{product.seller?.username}</p>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                        <Calendar className="h-3 w-3" />
+                        <span>Listed on {format(new Date(product.createdAt), "MMMM d, yyyy")}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-3 mt-4">
+                    {product.seller?.mobileNumber && (
+                      <div className="flex items-center gap-3 p-2 rounded-xl bg-white/5 hover:bg-white/10 transition-colors">
+                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                          <Phone className="h-4 w-4 text-primary" />
+                        </div>
+                        <p>{product.seller.mobileNumber}</p>
+                      </div>
+                    )}
+                    
+                    {product.hostel && (
+                      <div className="flex items-center gap-3 p-2 rounded-xl bg-white/5 hover:bg-white/10 transition-colors">
+                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                          <MapPin className="h-4 w-4 text-primary" />
+                        </div>
+                        <p>{product.hostel}</p>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+              
+              {product.paymentQR && (
+                <div className="mb-8">
+                  <h3 className="text-sm font-medium mb-3 text-muted-foreground">PAYMENT QR</h3>
+                  <div className="relative aspect-square w-40 h-40 overflow-hidden rounded-2xl border border-white/10 bg-white p-2 shadow-lg hover:scale-105 transition-transform duration-300">
                     <Image
-                      src={image}
-                      alt={`${product.title} - Image ${index + 1}`}
+                      src={product.paymentQR}
+                      alt="Payment QR"
                       fill
-                      className="object-cover"
+                      className="object-contain"
                     />
                   </div>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <CarouselPrevious />
-            <CarouselNext />
-          </Carousel>
-
-          {/* Status Badge */}
-          <div className="mb-4">
-            <Badge variant={
-              product.status === "AVAILABLE" 
-                ? "default" 
-                : product.status === "RESERVED" 
-                  ? "secondary" 
-                  : "destructive"
-            } className="text-sm">
-              {product.status === "AVAILABLE" 
-                ? "Available" 
-                : product.status === "RESERVED" 
-                  ? "Reserved" 
-                  : "Sold"}
-            </Badge>
-          </div>
-
-          {/* Seller controls */}
-          {isOwner && (
-            <div className="flex flex-wrap gap-2 mb-4">
-              <Link href={`/market/${productId}/edit`}>
-                <Button variant="outline" size="sm">
-                  <Edit className="mr-2 h-4 w-4" />
-                  Edit
-                </Button>
-              </Link>
-              
-              {product.status !== "AVAILABLE" && (
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => updateStatus("AVAILABLE")}
-                  disabled={statusLoading}
-                >
-                  {statusLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
-                  Mark as Available
-                </Button>
-              )}
-              
-              {product.status !== "RESERVED" && (
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => updateStatus("RESERVED")}
-                  disabled={statusLoading}
-                >
-                  {statusLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
-                  Mark as Reserved
-                </Button>
-              )}
-              
-              {product.status !== "SOLD" && (
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => updateStatus("SOLD")}
-                  disabled={statusLoading}
-                >
-                  {statusLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
-                  Mark as Sold
-                </Button>
-              )}
-            </div>
-          )}
-        </div>
-
-        <div>
-          <h1 className="text-2xl font-bold mb-2">{product.title}</h1>
-          <p className="text-xl font-bold text-primary mb-4">₹{product.price}</p>
-          
-          <div className="flex gap-2 mb-4">
-            <Badge variant="outline">{product.category}</Badge>
-            {product.condition && <Badge variant="outline">{product.condition}</Badge>}
-          </div>
-          
-          <div className="mb-6">
-            <h3 className="font-semibold mb-2">Description</h3>
-            <p className="text-muted-foreground whitespace-pre-line">{product.description}</p>
-          </div>
-          
-          <Card className="mb-6">
-            <CardContent className="p-4">
-              <h3 className="font-semibold mb-3">Seller Information</h3>
-              <div className="flex items-center gap-3 mb-3">
-                <Avatar>
-                  <AvatarImage src={product.seller?.image || ""} />
-                  <AvatarFallback>{product.seller?.username.substring(0, 2).toUpperCase()}</AvatarFallback>
-                </Avatar>
-                <div>
-                  <p className="font-medium">{product.seller?.username}</p>
-                  <p className="text-xs text-muted-foreground">Listed on {format(new Date(product.createdAt), "MMMM d, yyyy")}</p>
-                </div>
-              </div>
-              
-              {product.seller?.mobileNumber && (
-                <div className="flex items-center gap-2 mb-2">
-                  <Phone className="h-4 w-4 text-muted-foreground" />
-                  <p>{product.seller.mobileNumber}</p>
                 </div>
               )}
               
-              {product.hostel && (
-                <div className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4 text-muted-foreground" />
-                  <p>{product.hostel}</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-          
-          {product.paymentQR && (
-            <div className="mb-6">
-              <h3 className="font-semibold mb-2">Payment QR</h3>
-              <div className="relative aspect-square w-40 h-40 overflow-hidden rounded-md">
-                <Image
-                  src={product.paymentQR}
-                  alt="Payment QR"
-                  fill
-                  className="object-contain"
-                />
-              </div>
-            </div>
-          )}
-          
-          {/* Interest button (only for non-owners and available products) */}
-          {!isOwner && product.status === "AVAILABLE" && (
-            <Button
-              variant={isInterested ? "default" : "outline"}
-              className="w-full"
-              onClick={toggleInterest}
-              disabled={interestLoading}
-            >
-              {interestLoading ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <>
-                  {isInterested ? (
-                    <>
-                      <Check className="mr-2 h-4 w-4" />
-                      Interested
-                    </>
+              {/* Interest button (only for non-owners and available products) */}
+              {!isOwner && product.status === "AVAILABLE" && (
+                <Button
+                  variant={isInterested ? "default" : "outline"}
+                  className="w-full rounded-xl h-12 text-base shadow-lg hover:shadow-xl transition-all duration-300"
+                  onClick={toggleInterest}
+                  disabled={interestLoading}
+                >
+                  {interestLoading ? (
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                   ) : (
                     <>
-                      <Heart className="mr-2 h-4 w-4" />
-                      I am Interested
+                      {isInterested ? (
+                        <>
+                          <Check className="mr-2 h-5 w-5" />
+                          Interested
+                        </>
+                      ) : (
+                        <>
+                          <Heart className="mr-2 h-5 w-5" />
+                          I am Interested
+                        </>
+                      )}
                     </>
                   )}
-                </>
+                </Button>
               )}
-            </Button>
-          )}
-          
-          {/* Show interested users to owner */}
-          {isOwner && product.interestedUsers && product.interestedUsers.length > 0 && (
-            <div className="mt-6">
-              <h3 className="font-semibold mb-2">Interested Users ({product.interestedUsers.length})</h3>
-              <div className="flex flex-wrap gap-2">
-                {product.interestedUsers.map((user: User) => (
-                  <Badge key={user.id} variant="secondary">
-                    {user.username}
-                  </Badge>
-                ))}
-              </div>
             </div>
-          )}
+          </div>
         </div>
       </div>
     </div>
