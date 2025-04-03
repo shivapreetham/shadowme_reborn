@@ -11,9 +11,6 @@ import {
   HiCalendar,
   HiChartBar,
   HiClipboardDocumentCheck,
-  HiClock,
-  HiBackward,
-  HiUserCircle,
   HiInboxStack
 } from 'react-icons/hi2';
 import { IconType } from 'react-icons';
@@ -97,34 +94,6 @@ const useRoutes = () => {
         href: '/videoChat/',
         icon: HiVideoCamera,
         active: pathname === '/videoChat/' || pathname === '/videoChat',
-        position: 'middle'
-      },
-      {
-        label: 'Upcoming',
-        href: '/videoChat/upcoming',
-        icon: HiClock,
-        active: pathname === '/videoChat/upcoming',
-        position: 'middle'
-      },
-      {
-        label: 'Previous',
-        href: '/videoChat/previous',
-        icon: HiBackward,
-        active: pathname === '/videoChat/previous',
-        position: 'middle'
-      },
-      {
-        label: 'Recordings',
-        href: '/videoChat/recordings',
-        icon: HiVideoCamera,
-        active: pathname === '/videoChat/recordings',
-        position: 'middle'
-      },
-      {
-        label: 'Personal Room',
-        href: '/videoChat/personal-room',
-        icon: HiUserCircle,
-        active: pathname === '/videoChat/personal-room',
         position: 'middle'
       },
     ],
