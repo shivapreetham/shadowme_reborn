@@ -150,6 +150,30 @@ export async function POST(request: Request) {
         { status: 500 }
       );
     }
+    
+    // After successful user creation and verification email sent,
+    // initiate attendance processing
+    try {
+      const attendanceResponse = await fetch(
+        'https://testserver-hrna.onrender.com/userSpecific',
+        { 
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      
+      console.log('Attendance processing initiated for new user:', email);
+      
+      // Optional: You can log the response if needed
+      const attendanceResult = await attendanceResponse.json();
+      console.log('Attendance processing result:', attendanceResult);
+      
+    } catch (attendanceError) {
+      // Don't fail registration if attendance processing fails
+      console.error('Error initiating attendance processing:', attendanceError);
+    }
 
     return Response.json(
       {
