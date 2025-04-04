@@ -397,7 +397,7 @@ export default function ProductDetailPage() {
                   {/* Chat with seller button */}
                   <Button
                     variant="secondary"
-                    className="w-full rounded-xl h-12 text-base shadow-lg hover:shadow-xl transition-all duration-300"
+                    className="w-full rounded-xl bg-blue-400 h-12 text-base shadow-lg hover:shadow-xl transition-all duration-300 mb-10"
                     onClick={chatWithSeller}
                     disabled={chatLoading}
                   >
