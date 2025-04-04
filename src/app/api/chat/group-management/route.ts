@@ -5,7 +5,7 @@ async function addUserToGroups(email: string, userId: string) {
   try {
     const emailPattern = /^(20\d{2})?(ug|pg)?([a-z]+)?/i;
     const match = email.match(emailPattern);
-    
+    console.log("got the group connection request from ", email);
     if (!match) {
       return await handleDefaultGroups(userId);
     }

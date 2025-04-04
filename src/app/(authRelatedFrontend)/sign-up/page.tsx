@@ -11,15 +11,17 @@ import { Button } from '@/components/ui/button';
 import { Form, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import axios, { AxiosError } from 'axios';
-import { Loader2, Sparkles, CheckCircle2, XCircle } from 'lucide-react';
+import { Loader2, Sparkles, CheckCircle2, XCircle, Info } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { signUpSchema } from '@/schemas/signUpSchema';
 import { useToast } from '@/app/hooks/use-toast';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 export default function SignUpForm() {
   const [username, setUsername] = useState('');
   const [usernameMessage, setUsernameMessage] = useState('');
   const [isCheckingUsername, setIsCheckingUsername] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const debounced = useDebounceCallback(setUsername, 500);
   const router = useRouter();
@@ -61,21 +63,21 @@ export default function SignUpForm() {
 
   const onSubmit = async (data: z.infer<typeof signUpSchema>) => {
     try {
+      setIsSubmitting(true);
+      
+      // Main signup API call
       const response = await axios.post<ApiResponse>('/api/sign-up', data);
       
+      // Group management API call (non-blocking)
       try {
         await fetch('/api/chat/group-management', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data)
         });
-      } catch (error) {
-        console.error('Error adding to groups:', error);
-        // Don't block the signup process if group addition fails
-        toast({
-          title: 'Notice',
-          description: 'Account created but group assignment pending. This will be retried automatically.',
-        });
+      } catch (groupError) {
+        console.error('Error adding to groups:', groupError);
+        // Don't block the signup process
       }
   
       toast({
@@ -97,6 +99,8 @@ export default function SignUpForm() {
         description: errorMessage,
         variant: 'destructive',
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -106,130 +110,167 @@ export default function SignUpForm() {
         <div className="text-center space-y-3">
           <div className="relative inline-block">
             <h1 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary via-primary/90 to-primary/80">
-              NIT JSR Hub
+              NIT JSR Hub 
             </h1>
             <Sparkles className="absolute -right-8 -top-4 text-primary animate-bounce" />
           </div>
           <p className="text-lg text-foreground/80">Begin Your Journey</p>
         </div>
 
+        <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg mb-6">
+          <p className="text-sm text-blue-700 dark:text-blue-300">
+            <strong>App vs. NIT Credentials:</strong> First create your app account with a username and password of your choice. Then provide your NIT attendance portal credentials separately.
+          </p>
+        </div>
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <FormField
-              name="username"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem className="space-y-3">
-                  <FormLabel className="text-foreground/90">Username</FormLabel>
-                  <div className="relative">
+            {/* App Credentials Section */}
+            <div className="space-y-6 pb-6 border-b border-primary/10">
+              <h2 className="text-lg font-medium">App Credentials</h2>
+              <p className="text-sm text-muted-foreground">Choose your login details for NIT JSR Hub</p>
+              
+              <FormField
+                name="username"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem className="space-y-3">
+                    <FormLabel className="text-foreground/90">Username</FormLabel>
+                    <div className="relative">
+                      <Input
+                        {...field}
+                        className="bg-background/50 border-primary/20 hover:border-primary/30 transition-all duration-300 rounded-xl pr-10"
+                        placeholder="Choose your username"
+                        onChange={(e) => {
+                          field.onChange(e);
+                          debounced(e.target.value);
+                        }}
+                      />
+                      {isCheckingUsername && (
+                        <Loader2 className="absolute right-3 top-3 h-4 w-4 animate-spin text-primary/70" />
+                      )}
+                      {!isCheckingUsername && usernameMessage && (
+                        <div className="absolute right-3 top-3">
+                          {usernameMessage === 'Username is unique' ? (
+                            <CheckCircle2 className="h-4 w-4 text-green-500" />
+                          ) : (
+                            <XCircle className="h-4 w-4 text-red-500" />
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    {!isCheckingUsername && usernameMessage && (
+                      <p className={`text-sm ${usernameMessage === 'Username is unique' ? 'text-green-500' : 'text-red-500'}`}>
+                        {usernameMessage}
+                      </p>
+                    )}
+                    <FormMessage className="text-red-500" />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                name="email"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem className="space-y-3">
+                    <FormLabel className="text-foreground/90">Email</FormLabel>
                     <Input
                       {...field}
-                      className="bg-background/50 border-primary/20 hover:border-primary/30 transition-all duration-300 rounded-xl pr-10"
-                      placeholder="Choose your username"
-                      onChange={(e) => {
-                        field.onChange(e);
-                        debounced(e.target.value);
-                      }}
+                      className="bg-background/50 border-primary/20 hover:border-primary/30 transition-all duration-300 rounded-xl"
+                      placeholder="Your college email (e.g., 2020ugcs001@nitjsr.ac.in)"
                     />
-                    {isCheckingUsername && (
-                      <Loader2 className="absolute right-3 top-3 h-4 w-4 animate-spin text-primary/70" />
-                    )}
-                    {!isCheckingUsername && usernameMessage && (
-                      <div className="absolute right-3 top-3">
-                        {usernameMessage === 'Username is unique' ? (
-                          <CheckCircle2 className="h-4 w-4 text-green-500" />
-                        ) : (
-                          <XCircle className="h-4 w-4 text-red-500" />
-                        )}
-                      </div>
-                    )}
-                  </div>
-                  {!isCheckingUsername && usernameMessage && (
-                    <p className={`text-sm ${usernameMessage === 'Username is unique' ? 'text-green-500' : 'text-red-500'}`}>
-                      {usernameMessage}
+                    <p className="text-sm text-muted-foreground">
+                      We will send you a verification code
                     </p>
-                  )}
-                  <FormMessage className="text-red-500" />
-                </FormItem>
-              )}
-            />
+                    <FormMessage className="text-red-500" />
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              name="email"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem className="space-y-3">
-                  <FormLabel className="text-foreground/90">Email</FormLabel>
-                  <Input
-                    {...field}
-                    className="bg-background/50 border-primary/20 hover:border-primary/30 transition-all duration-300 rounded-xl"
-                    placeholder="Enter your email"
-                  />
-                  <p className="text-sm text-muted-foreground">
-                    We will send you a verification code
-                  </p>
-                  <FormMessage className="text-red-500" />
-                </FormItem>
-              )}
-            />
+              <FormField
+                name="password"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem className="space-y-3">
+                    <FormLabel className="text-foreground/90">Password</FormLabel>
+                    <Input
+                      type="password"
+                      {...field}
+                      className="bg-background/50 border-primary/20 hover:border-primary/30 transition-all duration-300 rounded-xl"
+                      placeholder="Create a strong password"
+                    />
+                    <FormMessage className="text-red-500" />
+                  </FormItem>
+                )}
+              />
+            </div>
 
-            <FormField
-              name="password"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem className="space-y-3">
-                  <FormLabel className="text-foreground/90">Password</FormLabel>
-                  <Input
-                    type="password"
-                    {...field}
-                    className="bg-background/50 border-primary/20 hover:border-primary/30 transition-all duration-300 rounded-xl"
-                    placeholder="Create a strong password"
-                  />
-                  <FormMessage className="text-red-500" />
-                </FormItem>
-              )}
-            />
+            {/* NIT Credentials Section */}
+            <div className="space-y-6">
+              <div className="flex items-center">
+                <h2 className="text-lg font-medium">NIT Attendance Credentials</h2>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="ghost" size="sm" className="ml-2 h-6 w-6 p-0">
+                        <Info className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="max-w-xs">These are the same credentials you use to log into the NIT attendance portal</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+              <p className="text-sm text-muted-foreground">Enter your NIT attendance portal login details</p>
 
-            {/* New NIT Credentials Fields */}
-            <FormField
-              name="NITUsername"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem className="space-y-3">
-                  <FormLabel className="text-foreground/90">NIT Username</FormLabel>
-                  <Input
-                    {...field}
-                    className="bg-background/50 border-primary/20 hover:border-primary/30 transition-all duration-300 rounded-xl"
-                    placeholder="Enter your NIT username"
-                  />
-                  <FormMessage className="text-red-500" />
-                </FormItem>
-              )}
-            />
+              <FormField
+                name="NITUsername"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem className="space-y-3">
+                    <FormLabel className="text-foreground/90">
+                      NIT Username 
+                      <span className="text-muted-foreground text-xs ml-2">(Registration Number)</span>
+                    </FormLabel>
+                    <Input
+                      {...field}
+                      className="bg-background/50 border-primary/20 hover:border-primary/30 transition-all duration-300 rounded-xl"
+                      placeholder="Your registration number (e.g., 2020UGCS001)"
+                    />
+                    <FormMessage className="text-red-500" />
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              name="NITPassword"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem className="space-y-3">
-                  <FormLabel className="text-foreground/90">NIT Password</FormLabel>
-                  <Input
-                    type="password"
-                    {...field}
-                    className="bg-background/50 border-primary/20 hover:border-primary/30 transition-all duration-300 rounded-xl"
-                    placeholder="Enter your NIT password"
-                  />
-                  <FormMessage className="text-red-500" />
-                </FormItem>
-              )}
-            />
+              <FormField
+                name="NITPassword"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem className="space-y-3">
+                    <FormLabel className="text-foreground/90">
+                      NIT Password
+                      <span className="text-muted-foreground text-xs ml-2">(Usually your registered phone number)</span>
+                    </FormLabel>
+                    <Input
+                      type="password"
+                      {...field}
+                      className="bg-background/50 border-primary/20 hover:border-primary/30 transition-all duration-300 rounded-xl"
+                      placeholder="Your NIT attendance portal password"
+                    />
+                    <FormMessage className="text-red-500" />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             <Button 
               type="submit" 
               className="w-full bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 text-lg shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300 rounded-xl"
-              disabled={form.formState.isSubmitting}
+              disabled={isSubmitting}
             >
-              {form.formState.isSubmitting ? (
+              {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Please wait

@@ -8,63 +8,52 @@ import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Form, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Sparkles } from 'lucide-react';
 import { useToast } from '@/app/hooks/use-toast';
-import { signInSchema } from '@/schemas/signInSchema';
-import { signIn } from 'next-auth/react';
-import { Sparkles } from 'lucide-react';
+import axios, { AxiosError } from 'axios';
 
-export default function SignUpForm() {
+// Schema for the reset password form
+const resetPasswordSchema = z.object({
+  verifyCode: z.string().length(6, 'Verification code must be 6 digits'),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
+});
+
+export default function ResetPasswordForm({ params }: { params: any }) {
   const router = useRouter();
   const { toast } = useToast();
+  const email = decodeURIComponent(params.email);
 
-  const form = useForm<z.infer<typeof signInSchema>>({
-    resolver: zodResolver(signInSchema),
+  const form = useForm<z.infer<typeof resetPasswordSchema>>({
+    resolver: zodResolver(resetPasswordSchema),
     defaultValues: {
-      identifier: '',
+      verifyCode: '',
       password: '',
     },
   });
-  const onSubmit = async (data: z.infer<typeof signInSchema>) => {
-    console.log('Signing in with:', data);
-    const result = await signIn('credentials', {
-      redirect: false,
-      identifier: data.identifier,
-      password: data.password,
-    });
-    console.log('Sign in result:', result);
-  
 
-    if (!result) {
+  const onSubmit = async (data: z.infer<typeof resetPasswordSchema>) => {
+    try {
+        await axios.post('/api/reset-password', {
+        email,
+        verifyCode: data.verifyCode,
+        password: data.password,
+      });
+      
       toast({
-        title: 'Error',
-        description: 'Something went wrong. Please try again later.',
+        title: 'Success',
+        description: 'Your password has been reset successfully.',
+      });
+
+      router.replace('/sign-in');
+    } catch (error) {
+      console.error('Error resetting password:', error);
+      const axiosError = error as AxiosError<any>;
+
+      toast({
+        title: 'Failed to Reset Password',
+        description: axiosError.response?.data.message || 'Something went wrong. Please try again.',
         variant: 'destructive',
       });
-      return;
-    }
-
-    if (result.error) {
-      if (result.error === 'CredentialsSignin') {
-        toast({
-          title: 'Login Failed',
-          description: 'Incorrect username or password',
-          variant: 'destructive',
-        });
-      } else {
-        toast({
-          title: 'Error',
-          description: result.error,
-          variant: 'destructive',
-        });
-      }
-    } else if (result.url) {
-      toast({
-        title: 'Signed In',
-        description: "You've successfully signed in!",
-        variant: 'default',
-      });
-      router.replace('/home');
     }
   };
 
@@ -74,29 +63,29 @@ export default function SignUpForm() {
         <div className="text-center space-y-3">
           <div className="relative inline-block">
             <h1 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary via-primary/90 to-primary/80">
-              NIT JSR hub -Shadowme
+              New Password
             </h1>
             <Sparkles className="absolute -right-8 -top-4 text-primary animate-bounce" />
           </div>
-          <p className="text-lg text-foreground/80">Welcome Back!</p>
+          <p className="text-lg text-foreground/80">Enter verification code sent to {email}</p>
         </div>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
-              name="identifier"
+              name="verifyCode"
               control={form.control}
               render={({ field }) => (
                 <FormItem className="space-y-3">
-                  <FormLabel htmlFor="identifier" className="text-foreground/90">
-                    Email/Username
+                  <FormLabel htmlFor="verifyCode" className="text-foreground/90">
+                    Verification Code
                   </FormLabel>
                   <Input 
                     {...field} 
-                    id="identifier" 
-                    name="identifier" 
+                    id="verifyCode" 
+                    name="verifyCode" 
                     className="bg-background/50 border-primary/20 hover:border-primary/30 transition-all duration-300 rounded-xl" 
-                    placeholder="Enter your email or username" 
+                    placeholder="Enter 6-digit code" 
                   />
                   <FormMessage className="text-red-500" />
                 </FormItem>
@@ -109,7 +98,7 @@ export default function SignUpForm() {
               render={({ field }) => (
                 <FormItem className="space-y-3">
                   <FormLabel htmlFor="password" className="text-foreground/90">
-                    Password
+                    New Password
                   </FormLabel>
                   <Input 
                     {...field} 
@@ -117,7 +106,7 @@ export default function SignUpForm() {
                     type="password" 
                     name="password" 
                     className="bg-background/50 border-primary/20 hover:border-primary/30 transition-all duration-300 rounded-xl" 
-                    placeholder="Enter your password" 
+                    placeholder="Create a new password" 
                   />
                   <FormMessage className="text-red-500" />
                 </FormItem>
@@ -135,7 +124,7 @@ export default function SignUpForm() {
                   Please wait
                 </>
               ) : (
-                'Sign In'
+                'Reset Password'
               )}
             </Button>
           </form>
@@ -143,20 +132,14 @@ export default function SignUpForm() {
 
         <div className="text-center space-y-4">
           <p className="text-muted-foreground">
-            Not a member?{' '}
+            Didn't receive a code?{' '}
             <Link 
-              href="/sign-up" 
+              href="/forgot-password" 
               className="text-primary/90 hover:text-primary transition-colors duration-300"
             >
-              Sign Up
+              Resend Code
             </Link>
           </p>
-          <Link 
-            href="/forgot-password" 
-            className="text-sm text-muted-foreground hover:text-foreground/80 transition-colors duration-300"
-          >
-            Forgot your password?
-          </Link>
         </div>
       </div>
     </div>
