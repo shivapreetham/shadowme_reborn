@@ -51,7 +51,7 @@ export default function VerifyAccount() {
         <div className="text-center space-y-3">
           <div className="relative inline-block">
             <h1 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary via-primary/90 to-primary/80">
-              ShatterBox
+              NIT JSR hub
             </h1>
             <Sparkles className="absolute -right-8 -top-4 text-primary animate-bounce" />
           </div>
