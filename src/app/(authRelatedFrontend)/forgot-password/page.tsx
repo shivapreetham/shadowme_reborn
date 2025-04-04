@@ -30,7 +30,7 @@ export default function ForgotPasswordForm() {
 
   const onSubmit = async (data: z.infer<typeof forgotPasswordSchema>) => {
     try {
-      const response = await axios.post('/api/forgot-password', data);
+      await axios.post('/api/forgot-password', data);
       
       toast({
         title: 'Success',

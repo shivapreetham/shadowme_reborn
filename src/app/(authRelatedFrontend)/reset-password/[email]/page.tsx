@@ -33,7 +33,7 @@ export default function ResetPasswordForm({ params }: { params: any }) {
 
   const onSubmit = async (data: z.infer<typeof resetPasswordSchema>) => {
     try {
-      const response = await axios.post('/api/reset-password', {
+        await axios.post('/api/reset-password', {
         email,
         verifyCode: data.verifyCode,
         password: data.password,
