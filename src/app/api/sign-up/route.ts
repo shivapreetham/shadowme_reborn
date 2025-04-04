@@ -34,12 +34,15 @@ export async function POST(request: Request) {
       );
     }
 
-    const { username, email, password, NITUsername, NITPassword} = body;
+    const { username, email, password, NITUsername, NITPassword } = body;
 
     // Validate required fields
     if (!username || !email || !password || !NITUsername || !NITPassword) {
       return Response.json(
-        { success: false, message: 'Missing required fields' },
+        { 
+          success: false, 
+          message: 'Missing required fields. Please fill in all fields.' 
+        },
         { status: 400 }
       );
     }
@@ -69,7 +72,7 @@ export async function POST(request: Request) {
 
     if (existingVerifiedUserByUsername) {
       return Response.json(
-        { success: false, message: 'Username already exists.' },
+        { success: false, message: 'Username already exists. Please choose another username.' },
         { status: 400 }
       );
     }
@@ -80,18 +83,19 @@ export async function POST(request: Request) {
     });
     
     const verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
+    let userId;
 
     if (existingUserByEmail) {
       if (existingUserByEmail.isVerified) {
         return Response.json(
-          { success: false, message: 'User already exists with this email' },
+          { success: false, message: 'An account with this email already exists. Please sign in instead.' },
           { status: 400 }
         );
       } else {
         // Update existing unverified user
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        await prisma.user.update({
+        const updatedUser = await prisma.user.update({
           where: { email },
           data: {
             username,
@@ -108,6 +112,8 @@ export async function POST(request: Request) {
             course
           },
         });
+        
+        userId = updatedUser.id;
       }
     } else {
       // Create new user if email doesn't exist
@@ -115,7 +121,7 @@ export async function POST(request: Request) {
       const expiryDate = new Date();
       expiryDate.setHours(expiryDate.getHours() + 1); // 1 hour expiry
 
-      await prisma.user.create({
+      const newUser = await prisma.user.create({
         data: {
           username,
           email,
@@ -131,54 +137,60 @@ export async function POST(request: Request) {
           course
         },
       });
+      
+      userId = newUser.id;
     }
 
     // Send verification email
-    const emailResponse = await sendVerificationEmail(
-      email,
-      username,
-      verifyCode
-    );
+    try {
+      const emailResponse = await sendVerificationEmail(
+        email,
+        username,
+        verifyCode
+      );
 
-    if (!emailResponse.success) {
-      console.error('Error sending verification email:', emailResponse.message);
-      return Response.json(
-        {
-          success: false,
-          message: emailResponse.message,
-        },
-        { status: 500 }
+      if (!emailResponse.success) {
+        console.error('Error sending verification email:', emailResponse.message);
+        // Don't prevent account creation if email fails
+      }
+    } catch (emailError) {
+      console.error('Failed to send verification email:', emailError);
+      // Continue with registration even if email fails
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          message: 'An unexpected error occurred during email verification. subscription limit reached. Please try again.' 
+        }), 
+        { 
+          status: 500,
+          headers: { 'Content-Type': 'application/json' }
+        }
       );
     }
     
-    // After successful user creation and verification email sent,
-    // initiate attendance processing
-    try {
-      const attendanceResponse = await fetch(
-        'https://testserver-hrna.onrender.com/userSpecific',
-        { 
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json'
+    // Trigger attendance processing in the background (non-blocking)
+    setTimeout(async () => {
+      try {
+        await fetch(
+          'https://testserver-hrna.onrender.com/userSpecific',
+          { 
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json'
+            }
           }
-        }
-      );
-      
-      console.log('Attendance processing initiated for new user:', email);
-      
-      // Optional: You can log the response if needed
-      const attendanceResult = await attendanceResponse.json();
-      console.log('Attendance processing result:', attendanceResult);
-      
-    } catch (attendanceError) {
-      // Don't fail registration if attendance processing fails
-      console.error('Error initiating attendance processing:', attendanceError);
-    }
+        );
+        console.log('Attendance processing initiated for new user:', email);
+      } catch (attendanceError) {
+        console.error('Error initiating attendance processing:', attendanceError);
+      }
+    }, 0);
 
     return Response.json(
       {
         success: true,
-        message: 'User registered successfully. Please verify your account.',
+        message: 'Account created successfully! Please check your email for the verification code.',
+        userId
       },
       { status: 201 }
     );
@@ -187,7 +199,7 @@ export async function POST(request: Request) {
     return new Response(
       JSON.stringify({ 
         success: false, 
-        message: 'Error registering user.' 
+        message: 'An unexpected error occurred during registration. Please try again.' 
       }), 
       { 
         status: 500,
