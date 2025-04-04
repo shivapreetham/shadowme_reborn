@@ -18,7 +18,7 @@ const resetPasswordSchema = z.object({
   password: z.string().min(8, 'Password must be at least 8 characters'),
 });
 
-export default function ResetPasswordForm({ params }: { params: { email: string } }) {
+export default function ResetPasswordForm({ params }: { params: any }) {
   const router = useRouter();
   const { toast } = useToast();
   const email = decodeURIComponent(params.email);

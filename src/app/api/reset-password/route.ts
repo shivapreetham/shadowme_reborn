@@ -44,15 +44,20 @@ export async function POST(request: Request) {
     // Hash the new password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Update user with new password and clear verification code
-    // await prisma.user.update({
-    //   where: { id: user.id },
-    //   data: {
-    //     hashedPassword,
-    //     verifyCode: null,
-    //     verifyCodeExpiry: null
-    //   }
-    // });
+    // Generate a new random code and set far future expiry 
+    // (since we can't set null in a non-nullable field)
+    const randomCode = Math.random().toString(36).substring(2, 8);
+    const farFutureDate = new Date(2099, 0, 1);
+
+    // Update user with new password and reset verification code
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        hashedPassword,
+        verifyCode: randomCode, // Use random string instead of null
+        verifyCodeExpiry: farFutureDate // Use far future date instead of null
+      }
+    });
 
     return NextResponse.json(
       { success: true, message: 'Password reset successfully' },

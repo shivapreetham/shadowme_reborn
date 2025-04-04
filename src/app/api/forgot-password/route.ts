@@ -1,34 +1,6 @@
 import prisma from '@/lib/prismadb';
 import { NextResponse } from 'next/server';
-import { sendVerificationEmail } from '@/helpers/sendVerificationEmails';
-
-// Helper function to send email (you can reuse your existing email sending function)
-async function sendPasswordResetEmail(email: string, username: string, verifyCode: string) {
-  // You may already have a helper for sending emails like sendVerificationEmail
-  // This is a placeholder - replace with your actual email sending logic
-  try {
-    // Reuse your email sending logic from sendVerificationEmail
-    // You should modify it to use a password reset template instead
-    
-    // Example email content
-    const subject = 'Reset your password for NIT JSR Hub';
-    const text = `Hello ${username},\n\nYou requested to reset your password. Use this verification code to reset your password: ${verifyCode}\n\nThis code will expire in 1 hour.\n\nBest,\nNIT JSR Hub Team`;
-    
-    // Assuming you're using the same function from sendVerificationEmails.ts
-    await sendVerificationEmail(email, subject, text);
-    
-    // This is just a placeholder - replace with your actual email sending logic
-    console.log('Sending password reset email to:', email);
-    
-    return { success: true };
-  } catch (error) {
-    console.error('Error sending password reset email:', error);
-    return { 
-      success: false, 
-      message: 'Failed to send password reset email'
-    };
-  }
-}
+import { sendPasswordResetEmail } from '@/helpers/sendPasswordResetEmails';
 
 export async function POST(request: Request) {
   try {
