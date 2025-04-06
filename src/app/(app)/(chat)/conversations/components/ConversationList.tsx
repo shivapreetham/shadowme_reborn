@@ -22,6 +22,9 @@ const ConversationList: React.FC<ConversationListProps> = ({
   initialConversations,
   users,
 }) => {
+
+  // console.log("got the initial conversations", initialConversations);
+  // console.log("users ",users)
   const session = useSession();
   const [conversations, setConversations] = useState(initialConversations);
   const [isModalOpen, setIsModalOpen] = useState(false);
