@@ -27,7 +27,7 @@ model User {
   honorScore                   Int                 @default(100)
   lastSeen                     DateTime            @default(now())
   activeStatus                 Boolean             @default(false)
-  
+  createdAt                    DateTime            @default(now())
   // Relations
   anonymousMessages            AnonymousMessage[]
   

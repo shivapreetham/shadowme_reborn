@@ -128,7 +128,7 @@ export default function ProductDetailPage() {
 
       if (response.ok) {
         const { conversationId } = await response.json();
-        router.push(`/user/conversations/${conversationId}`);
+        router.push(`/conversations/${conversationId}`);
       }
     } catch (error) {
       console.error("Failed to start conversation:", error);
